@@ -29,6 +29,33 @@ antigravity open .
 
 Antigravity가 `.agent/skills/`의 스킬을 자동 감지합니다.
 
+### 기존 프로젝트에 통합하기
+
+이미 Antigravity 프로젝트가 있다면 스킬만 복사하면 됩니다:
+
+```bash
+# 옵션 1: 스킬만 복사
+cp -r subagent-orchestrator/.agent/skills /path/to/your-project/.agent/
+
+# 옵션 2: 스킬 + 대시보드
+cp -r subagent-orchestrator/.agent/skills /path/to/your-project/.agent/
+cp -r subagent-orchestrator/scripts/dashboard* /path/to/your-project/scripts/
+cp subagent-orchestrator/package.json /path/to/your-project/  # 의존성 병합
+
+# 옵션 3: 특정 스킬만
+cp -r subagent-orchestrator/.agent/skills/backend-agent /path/to/your-project/.agent/skills/
+cp -r subagent-orchestrator/.agent/skills/frontend-agent /path/to/your-project/.agent/skills/
+```
+
+본인 프로젝트에서:
+```bash
+cd /path/to/your-project
+npm install  # 대시보드 사용할 경우
+antigravity open .
+```
+
+모든 스킬이 이제 본인 프로젝트에서 사용 가능합니다!
+
 ### 2. 채팅으로 사용
 
 **간단한 작업** (단일 에이전트 자동 활성화):

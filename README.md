@@ -29,6 +29,33 @@ antigravity open .
 
 Antigravity automatically detects skills in `.agent/skills/`.
 
+### Using with Existing Projects
+
+If you already have an Antigravity project, just copy the skills:
+
+```bash
+# Option 1: Skills only
+cp -r subagent-orchestrator/.agent/skills /path/to/your-project/.agent/
+
+# Option 2: Skills + dashboards
+cp -r subagent-orchestrator/.agent/skills /path/to/your-project/.agent/
+cp -r subagent-orchestrator/scripts/dashboard* /path/to/your-project/scripts/
+cp subagent-orchestrator/package.json /path/to/your-project/  # merge dependencies
+
+# Option 3: Specific skills only
+cp -r subagent-orchestrator/.agent/skills/backend-agent /path/to/your-project/.agent/skills/
+cp -r subagent-orchestrator/.agent/skills/frontend-agent /path/to/your-project/.agent/skills/
+```
+
+Then in your project:
+```bash
+cd /path/to/your-project
+npm install  # if using dashboards
+antigravity open .
+```
+
+All skills are now available in your project!
+
 ### 2. Chat
 
 **Simple task** (single agent auto-activates):
