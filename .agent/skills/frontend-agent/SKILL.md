@@ -5,106 +5,37 @@ description: Frontend specialist for React, Next.js, TypeScript, and modern UI d
 
 # Frontend Agent - UI/UX Specialist
 
-## Use this skill when
-
+## When to use
 - Building user interfaces and components
 - Client-side logic and state management
 - Styling and responsive design
 - Form validation and user interactions
 - Integrating with backend APIs
 
-## Do not use this skill when
+## When NOT to use
+- Backend API implementation -> use Backend Agent
+- Native mobile development -> use Mobile Agent
 
-- Backend API implementation (use Backend Agent)
-- Native mobile development (use Mobile Agent)
+## Core Rules
+1. TypeScript strict mode; explicit interfaces for all props
+2. Tailwind CSS only (no inline styles, no CSS modules)
+3. Semantic HTML with ARIA labels; keyboard navigation required
+4. Loading, error, and empty states for every async operation
+5. Responsive at 320px, 768px, 1024px, 1440px
+6. shadcn/ui + Radix for component primitives
 
-## Tech Stack
+## How to Execute
+Follow `resources/execution-protocol.md` step by step.
+See `resources/examples.md` for input/output examples.
+Before submitting, run `resources/checklist.md`.
 
-- **Framework**: Next.js 14+ (App Router), React 18+
-- **Language**: TypeScript (strict mode)
-- **Styling**: Tailwind CSS 3+ (NO inline styles)
-- **Components**: shadcn/ui, Radix UI
-- **State**: React Context, Zustand, or Redux Toolkit
-- **Forms**: React Hook Form + Zod
-- **API Client**: TanStack Query
-- **Testing**: Vitest, React Testing Library, Playwright
+## Serena Memory (CLI Mode)
+See `../_shared/serena-memory-protocol.md`.
 
-## Code Standards
-
-- Explicit TypeScript interfaces for props
-- Tailwind classes only (no inline styles)
-- Semantic HTML with ARIA labels
-- Keyboard navigation support
-
-See `resources/component-template.tsx` for examples.
-See `resources/tailwind-rules.md` for styling guidelines.
-
-## Project Structure
-
-```
-src/
-  app/           # Next.js App Router pages
-  components/
-    ui/          # Reusable primitives (button, card)
-    [feature]/   # Feature components
-  lib/
-    api/         # API clients
-    hooks/       # Custom hooks
-  types/         # TypeScript types
-```
-
-## Output Format
-
-```markdown
-## Task: [Title]
-
-### Implementation
-- Components created: [list]
-- Routes added: [list]
-- State management: [approach]
-
-### Files Created/Modified
-- `src/components/[name].tsx` (NEW)
-
-### Testing
-- Unit tests: X passing
-- Lighthouse: XX/100
-```
-
-## Checklist
-
-- [ ] TypeScript strict mode, no errors
-- [ ] Tailwind CSS used (no inline styles)
-- [ ] Responsive design (mobile, tablet, desktop)
-- [ ] Loading and error states handled
-- [ ] WCAG 2.1 AA accessibility
-- [ ] Unit tests written
-
-## Serena MCP
-
-- `find_symbol("ComponentName")`: Locate existing component
-- `get_symbols_overview("src/components")`: List all components
-- `find_referencing_symbols("Button")`: Find usages before changes
-
-## Serena Memory Protocol (CLI Mode)
-
-When running as a CLI subagent via `gemini -p "..." --yolo`, follow this protocol:
-
-### On Start
-1. `read_memory("task-board.md")` to confirm your assigned task
-2. `write_memory("progress-{agent-id}.md", initial progress entry)` with Turn 1 status
-
-### During Execution
-- Every 3-5 turns: `edit_memory("progress-{agent-id}.md")` to append a new turn entry
-- Include: action taken, current status, files created/modified
-
-### On Completion
-- `write_memory("result-{agent-id}.md")` with final result including:
-  - Status: `completed` or `failed`
-  - Summary of work done
-  - Files created/modified
-  - Acceptance criteria checklist
-
-### On Failure
-- Still create `result-{agent-id}.md` with Status: `failed`
-- Include detailed error description and what remains incomplete
+## References
+- Execution steps: `resources/execution-protocol.md`
+- Code examples: `resources/examples.md`
+- Checklist: `resources/checklist.md`
+- Tech stack: `resources/tech-stack.md`
+- Component template: `resources/component-template.tsx`
+- Tailwind rules: `resources/tailwind-rules.md`

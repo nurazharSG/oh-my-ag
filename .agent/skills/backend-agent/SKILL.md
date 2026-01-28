@@ -5,114 +5,36 @@ description: Backend specialist for APIs, databases, authentication, and server-
 
 # Backend Agent - API & Server Specialist
 
-## Use this skill when
-
+## When to use
 - Building REST APIs or GraphQL endpoints
 - Database design and migrations
 - Authentication and authorization
 - Server-side business logic
 - Background jobs and queues
 
-## Do not use this skill when
+## When NOT to use
+- Frontend UI -> use Frontend Agent
+- Mobile-specific code -> use Mobile Agent
 
-- Frontend UI (use Frontend Agent)
-- Mobile-specific code (use Mobile Agent)
+## Core Rules
+1. Clean architecture: router -> service -> repository -> models
+2. No business logic in route handlers
+3. All inputs validated with Pydantic/Zod
+4. Parameterized queries only (never string interpolation)
+5. JWT + bcrypt for auth; rate limit auth endpoints
+6. Async/await consistently; type hints on all signatures
 
-## Tech Stack
+## How to Execute
+Follow `resources/execution-protocol.md` step by step.
+See `resources/examples.md` for input/output examples.
+Before submitting, run `resources/checklist.md`.
 
-### Python (Preferred)
-- **Framework**: FastAPI 0.110+
-- **ORM**: SQLAlchemy 2.0
-- **Validation**: Pydantic v2
-- **Database**: PostgreSQL 16+, Redis 7+
-- **Auth**: python-jose (JWT), passlib (bcrypt)
-- **Testing**: pytest, httpx
+## Serena Memory (CLI Mode)
+See `../_shared/serena-memory-protocol.md`.
 
-### Node.js (Alternative)
-- **Framework**: Express.js, NestJS, Hono
-- **ORM**: Prisma, Drizzle
-- **Validation**: Zod
-- **Auth**: jsonwebtoken, bcrypt
-- **Testing**: Jest, Supertest
-
-## Architecture
-
-```
-backend/
-  domain/           # Business logic (pure Python)
-  application/      # Use cases, services
-  infrastructure/   # Database, cache, external APIs
-  presentation/     # API endpoints, middleware
-```
-
-## Security Requirements
-
-- Password hashing: bcrypt (cost factor 10-12)
-- JWT: 15min access tokens, 7 day refresh tokens
-- Rate limiting on auth endpoints
-- Input validation with Pydantic/Zod
-- Parameterized queries (never string interpolation)
-
-See `resources/api-template.py` for implementation examples.
-
-## Output Format
-
-```markdown
-## Task: [Title]
-
-### Endpoints Implemented
-- POST /api/auth/login
-- GET /api/todos
-
-### Database Schema
-- users table: id, email, password_hash
-- Indexes on email
-
-### Security
-- [x] Password hashing with bcrypt
-- [x] JWT properly signed
-- [x] Rate limiting
-
-### Files Created
-- `app/api/[name].py`
-- `app/models/[name].py`
-- `tests/test_[name].py`
-```
-
-## Checklist
-
-- [ ] All endpoints tested (unit + integration)
-- [ ] OpenAPI documentation complete
-- [ ] Database migrations created
-- [ ] JWT, password hashing, rate limiting
-- [ ] Input validation with Pydantic
-- [ ] SQL injection protected (using ORM)
-- [ ] Test coverage > 80%
-
-## Serena MCP
-
-- `find_symbol("create_todo")`: Locate existing function
-- `get_symbols_overview("app/api")`: List all endpoints
-
-## Serena Memory Protocol (CLI Mode)
-
-When running as a CLI subagent via `gemini -p "..." --yolo`, follow this protocol:
-
-### On Start
-1. `read_memory("task-board.md")` to confirm your assigned task
-2. `write_memory("progress-{agent-id}.md", initial progress entry)` with Turn 1 status
-
-### During Execution
-- Every 3-5 turns: `edit_memory("progress-{agent-id}.md")` to append a new turn entry
-- Include: action taken, current status, files created/modified
-
-### On Completion
-- `write_memory("result-{agent-id}.md")` with final result including:
-  - Status: `completed` or `failed`
-  - Summary of work done
-  - Files created/modified
-  - Acceptance criteria checklist
-
-### On Failure
-- Still create `result-{agent-id}.md` with Status: `failed`
-- Include detailed error description and what remains incomplete
+## References
+- Execution steps: `resources/execution-protocol.md`
+- Code examples: `resources/examples.md`
+- Checklist: `resources/checklist.md`
+- Tech stack: `resources/tech-stack.md`
+- API template: `resources/api-template.py`

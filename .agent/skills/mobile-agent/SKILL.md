@@ -5,116 +5,35 @@ description: Mobile specialist for Flutter, React Native, and cross-platform mob
 
 # Mobile Agent - Cross-Platform Mobile Specialist
 
-## Use this skill when
-
+## When to use
 - Building native mobile applications (iOS + Android)
 - Mobile-specific UI patterns
 - Platform features (camera, GPS, push notifications)
 - Offline-first architecture
 
-## Do not use this skill when
+## When NOT to use
+- Web frontend -> use Frontend Agent
+- Backend APIs -> use Backend Agent
 
-- Web frontend (use Frontend Agent)
-- Backend APIs (use Backend Agent)
+## Core Rules
+1. Clean Architecture: domain -> data -> presentation
+2. Riverpod/Bloc for state management (no raw setState for complex logic)
+3. Material Design 3 (Android) + iOS HIG (iOS)
+4. All controllers disposed in `dispose()` method
+5. Dio with interceptors for API calls; handle offline gracefully
+6. 60fps target; test on both platforms
 
-## Tech Stack
+## How to Execute
+Follow `resources/execution-protocol.md` step by step.
+See `resources/examples.md` for input/output examples.
+Before submitting, run `resources/checklist.md`.
 
-### Flutter (Recommended)
-- **Framework**: Flutter 3.19+
-- **Language**: Dart 3.3+
-- **State**: Riverpod 2.4+, Bloc, Provider
-- **Navigation**: GoRouter 13+
-- **API Client**: Dio
-- **Local Storage**: Drift, Hive
-- **Testing**: flutter_test, mockito
+## Serena Memory (CLI Mode)
+See `../_shared/serena-memory-protocol.md`.
 
-### React Native (Alternative)
-- **Framework**: React Native 0.73+
-- **Language**: TypeScript
-- **State**: Redux Toolkit, Zustand
-- **Navigation**: React Navigation 6+
-- **Testing**: Jest, React Native Testing Library
-
-## Project Structure (Flutter)
-
-```
-lib/
-  main.dart
-  core/              # Theme, router, utils
-  features/
-    [feature]/
-      data/          # Models, repositories
-      domain/        # Entities, use cases
-      presentation/  # Screens, widgets, providers
-  shared/            # Shared widgets
-```
-
-## Architecture Pattern
-
-Clean Architecture with Riverpod:
-1. Entity (Domain) - Pure business objects
-2. Repository Interface (Domain) - Abstract data access
-3. Repository Implementation (Data) - Dio, database
-4. Providers (Presentation) - State management
-5. Screens/Widgets (Presentation) - UI
-
-See `resources/screen-template.dart` for implementation example.
-
-## Platform Guidelines
-
-- Material Design 3 for Android
-- iOS Human Interface Guidelines for iOS
-- Use `Platform.isIOS` for platform-specific code
-
-## Output Format
-
-```markdown
-## Task: [Title]
-
-### Implementation
-- Screens: [list]
-- State: Riverpod with clean architecture
-- API Integration: Dio with auth interceptors
-
-### Platform Support
-- [x] iOS (14.0+)
-- [x] Android (API 24+)
-- [x] Dark mode
-
-### Testing
-- Unit tests: X passing
-- Widget tests: X passing
-```
-
-## Checklist
-
-- [ ] Material Design 3 / iOS HIG followed
-- [ ] State management implemented (Riverpod/Bloc)
-- [ ] API integration with error handling
-- [ ] Loading and error states
-- [ ] Unit tests for business logic
-- [ ] Widget tests for UI
-- [ ] 60fps performance (no jank)
-
-## Serena Memory Protocol (CLI Mode)
-
-When running as a CLI subagent via `gemini -p "..." --yolo`, follow this protocol:
-
-### On Start
-1. `read_memory("task-board.md")` to confirm your assigned task
-2. `write_memory("progress-{agent-id}.md", initial progress entry)` with Turn 1 status
-
-### During Execution
-- Every 3-5 turns: `edit_memory("progress-{agent-id}.md")` to append a new turn entry
-- Include: action taken, current status, files created/modified
-
-### On Completion
-- `write_memory("result-{agent-id}.md")` with final result including:
-  - Status: `completed` or `failed`
-  - Summary of work done
-  - Files created/modified
-  - Acceptance criteria checklist
-
-### On Failure
-- Still create `result-{agent-id}.md` with Status: `failed`
-- Include detailed error description and what remains incomplete
+## References
+- Execution steps: `resources/execution-protocol.md`
+- Code examples: `resources/examples.md`
+- Checklist: `resources/checklist.md`
+- Tech stack: `resources/tech-stack.md`
+- Screen template: `resources/screen-template.dart`
