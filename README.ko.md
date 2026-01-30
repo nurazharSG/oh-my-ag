@@ -106,10 +106,6 @@ antigravity open .
 bunx oh-my-antigravity dashboard      # 터미널 대시보드 (실시간)
 bunx oh-my-antigravity dashboard:web  # 웹 대시보드 (브라우저 UI)
 # → http://localhost:9847
-
-# 또는 npm 스크립트 사용 (클론한 경우)
-npm run dashboard      # 터미널 대시보드
-npm run dashboard:web  # 웹 대시보드
 ```
 
 ## 동작 원리

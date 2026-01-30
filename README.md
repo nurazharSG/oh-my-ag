@@ -137,10 +137,6 @@ This creates `.agent/config/user-preferences.yaml` for your project.
 bunx oh-my-antigravity dashboard      # Terminal dashboard (bash)
 bunx oh-my-antigravity dashboard:web  # Web dashboard (Node.js)
 # → http://localhost:9847
-
-# Or via npm scripts (if cloned)
-npm run dashboard      # Terminal dashboard
-npm run dashboard:web  # Web dashboard
 ```
 
 ## How It Works
