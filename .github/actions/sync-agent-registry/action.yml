@@ -1,0 +1,102 @@
+name: 'Sync Agent Registry'
+description: 'Sync .agent/ directory from central registry with checksum verification'
+
+inputs:
+  registry-repo:
+    description: 'Registry repository (owner/repo)'
+    required: true
+    default: 'gahyun-git/mimic-skills'
+  version:
+    description: 'Version to sync (e.g., "1.2.0" or "latest")'
+    required: true
+    default: 'latest'
+  target-dir:
+    description: 'Target directory for .agent/ files'
+    required: false
+    default: '.'
+  github-token:
+    description: 'GitHub token for API access'
+    required: true
+
+outputs:
+  synced-version:
+    description: 'The version that was synced'
+    value: ${{ steps.sync.outputs.version }}
+  files-synced:
+    description: 'Number of files synced'
+    value: ${{ steps.sync.outputs.files_synced }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Resolve version
+      id: resolve
+      shell: bash
+      env:
+        REGISTRY_REPO: ${{ inputs.registry-repo }}
+        INPUT_VERSION: ${{ inputs.version }}
+        GH_TOKEN: ${{ inputs.github-token }}
+      run: |
+        if [ "$INPUT_VERSION" = "latest" ]; then
+          VERSION=$(gh api repos/${REGISTRY_REPO}/releases/latest --jq '.tag_name' | sed 's/^v//')
+          echo "Resolved latest version: $VERSION"
+        else
+          VERSION="$INPUT_VERSION"
+          echo "Using specified version: $VERSION"
+        fi
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+        echo "tag=v$VERSION" >> $GITHUB_OUTPUT
+
+    - name: Download release artifacts
+      shell: bash
+      env:
+        REGISTRY_REPO: ${{ inputs.registry-repo }}
+        RELEASE_TAG: ${{ steps.resolve.outputs.tag }}
+        GH_TOKEN: ${{ inputs.github-token }}
+      run: |
+        echo "Downloading artifacts for $RELEASE_TAG..."
+        gh release download "$RELEASE_TAG" \
+          --repo "$REGISTRY_REPO" \
+          --pattern "agent-skills.tar.gz" \
+          --pattern "agent-skills.tar.gz.sha256" \
+          --pattern "prompt-manifest.json" \
+          --dir /tmp/agent-registry
+
+    - name: Verify checksum
+      shell: bash
+      run: |
+        echo "Verifying SHA256 checksum..."
+        cd /tmp/agent-registry
+        sha256sum -c agent-skills.tar.gz.sha256
+        echo "Checksum verified successfully"
+
+    - name: Extract and sync
+      id: sync
+      shell: bash
+      env:
+        TARGET_DIR: ${{ inputs.target-dir }}
+        RESOLVED_VERSION: ${{ steps.resolve.outputs.version }}
+      run: |
+        echo "Extracting to ${TARGET_DIR}..."
+
+        # Backup existing .agent if present
+        if [ -d "${TARGET_DIR}/.agent" ]; then
+          echo "Backing up existing .agent directory..."
+          mv "${TARGET_DIR}/.agent" "${TARGET_DIR}/.agent.backup.$(date +%Y%m%d%H%M%S)"
+        fi
+
+        # Extract tarball
+        tar -xzvf /tmp/agent-registry/agent-skills.tar.gz -C "${TARGET_DIR}"
+
+        # Count synced files
+        FILES_COUNT=$(find "${TARGET_DIR}/.agent" -type f | wc -l | tr -d ' ')
+        echo "files_synced=$FILES_COUNT" >> $GITHUB_OUTPUT
+        echo "version=$RESOLVED_VERSION" >> $GITHUB_OUTPUT
+
+        echo "Synced $FILES_COUNT files (version $RESOLVED_VERSION)"
+
+    - name: Cleanup
+      shell: bash
+      run: |
+        rm -rf /tmp/agent-registry
+        echo "Cleanup complete"

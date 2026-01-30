@@ -11,6 +11,7 @@ build/
 *.js.map
 !orchestrator.ts
 !scripts/dashboard-web/**/*.js
+!scripts/generate-manifest.js
 
 # Environment
 .env

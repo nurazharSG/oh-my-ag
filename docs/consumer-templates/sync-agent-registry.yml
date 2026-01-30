@@ -1,0 +1,93 @@
+# Consumer Workflow: Sync Agent Registry
+# Copy this file to your project: .github/workflows/sync-agent-registry.yml
+#
+# This workflow syncs the .agent/ directory from the central registry
+# when .agent-registry.yaml version changes.
+
+name: Sync Agent Registry
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.agent-registry.yaml'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to sync (leave empty to use .agent-registry.yaml)'
+        required: false
+        default: ''
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Read version from config
+        id: config
+        env:
+          INPUT_VERSION: ${{ github.event.inputs.version }}
+        run: |
+          if [ -n "$INPUT_VERSION" ]; then
+            VERSION="$INPUT_VERSION"
+          elif [ -f ".agent-registry.yaml" ]; then
+            VERSION=$(grep -E '^version:' .agent-registry.yaml | sed 's/version:[[:space:]]*"\?\([^"]*\)"\?/\1/')
+          else
+            echo "Error: No version specified and .agent-registry.yaml not found"
+            exit 1
+          fi
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Syncing version: $VERSION"
+
+      - name: Sync from registry
+        # TODO: Replace with your registry repo
+        uses: gahyun-git/mimic-skills/.github/actions/sync-agent-registry@main
+        with:
+          registry-repo: gahyun-git/mimic-skills
+          version: ${{ steps.config.outputs.version }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Preserve local config
+        run: |
+          # Restore local config files if they existed
+          if [ -f ".agent-registry.yaml" ]; then
+            # Read preserve patterns from config
+            PRESERVE=$(grep -A 100 'preserve:' .agent-registry.yaml | grep -E '^\s+-' | sed 's/.*- "\?\([^"]*\)"\?/\1/' || true)
+
+            for pattern in $PRESERVE; do
+              BACKUP_FILE=".agent.backup.*/${pattern}"
+              if ls $BACKUP_FILE 1> /dev/null 2>&1; then
+                echo "Restoring preserved file: $pattern"
+                mkdir -p "$(dirname "$pattern")"
+                cp -f $BACKUP_FILE "$pattern" 2>/dev/null || true
+              fi
+            done
+          fi
+
+      - name: Commit synced files
+        env:
+          CONFIG_VERSION: ${{ steps.config.outputs.version }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Check if there are changes
+          if git diff --quiet .agent/; then
+            echo "No changes to commit"
+            exit 0
+          fi
+
+          git add .agent/
+          git commit -m "chore: sync agent-registry v${CONFIG_VERSION}"
+          git push
+          echo "Committed synced files for version $CONFIG_VERSION"
+
+      - name: Cleanup old backups
+        run: |
+          # Remove backup directories older than 7 days
+          find . -maxdepth 1 -type d -name ".agent.backup.*" -mtime +7 -exec rm -rf {} + 2>/dev/null || true
+          echo "Cleanup complete"
