@@ -2,6 +2,14 @@
   "name": "oh-my-antigravity",
   "version": "1.0.0",
   "description": "Professional agent skills for Google Antigravity IDE - PM, Frontend, Backend, Mobile, QA, and Debug specialists that work together seamlessly",
+  "type": "module",
+  "bin": {
+    "oh-my-antigravity": "./bin/cli.js"
+  },
+  "files": [
+    "bin",
+    ".agent/skills"
+  ],
   "keywords": [
     "antigravity",
     "skills",
@@ -19,6 +27,9 @@
   "author": "",
   "license": "MIT",
   "scripts": {
+    "build": "bun build src/cli.ts --outfile bin/cli.js --target node --minify",
+    "dev": "bun run src/cli.ts",
+    "prepublishOnly": "bun run build",
     "validate": "node scripts/validate-skills.js",
     "setup": "echo '✅ Skills are ready! Open this project in Antigravity IDE and start chatting.'",
     "info": "cat USAGE.md",
@@ -26,8 +37,16 @@
     "dashboard:web": "node scripts/dashboard-web/server.js"
   },
   "dependencies": {
+    "@clack/prompts": "^1.0.0",
     "chokidar": "^4.0.0",
+    "picocolors": "^1.1.1",
     "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.3.8"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
   },
   "repository": {
     "type": "git",

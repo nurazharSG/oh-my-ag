@@ -1,4 +1,6 @@
-# Antigravity Multi-Agent Skills
+# 🛸 Antigravity Multi-Agent Skills
+
+[한국어](./README-ko.md)
 
 Professional agent skills for Google Antigravity IDE featuring specialized PM, Frontend, Backend, Mobile, QA, and Debug agents — coordinated through Antigravity's Agent Manager, CLI-based SubAgent Orchestrator, and real-time Serena Memory dashboards.
 
@@ -6,6 +8,40 @@ Professional agent skills for Google Antigravity IDE featuring specialized PM, F
 > ```bash
 > gh repo star first-fluke/oh-my-antigravity
 > ```
+
+## Architecture
+
+```mermaid
+flowchart TB
+    subgraph Coordination["🎯 Coordination"]
+        PM[pm-agent<br/>Task Decomposition]
+        WF[workflow-guide<br/>Manual Orchestration]
+        ORC[orchestrator<br/>Parallel Execution]
+    end
+
+    subgraph Domain["💻 Domain Agents"]
+        FE[frontend-agent<br/>React/Next.js]
+        BE[backend-agent<br/>FastAPI/Python]
+        MB[mobile-agent<br/>Flutter/Dart]
+    end
+
+    subgraph Quality["✅ Quality"]
+        QA[qa-agent<br/>Security/A11y/Perf]
+        DBG[debug-agent<br/>Bug Fixing]
+    end
+
+    subgraph Utility["🔧 Utility"]
+        CMT[commit<br/>Conventional Commits]
+    end
+
+    PM -->|API Contracts| FE & BE & MB
+    ORC -->|Spawns| FE & BE & MB
+    WF -->|Coordinates| FE & BE & MB
+    FE & BE & MB -->|Review| QA
+    QA -->|Issues| DBG
+    DBG -->|Fix| FE & BE & MB
+    FE & BE & MB -->|Changes| CMT
+```
 
 ## What Is This?
 
@@ -25,42 +61,37 @@ A collection of **Antigravity Skills** enabling collaborative multi-agent develo
 
 ## Quick Start
 
-### 1. Clone & Open
+### Option 1: Interactive CLI (Recommended)
 
 ```bash
-git clone <repository-url>
+bunx oh-my-antigravity
+```
+
+Select your project type and skills will be installed to `.agent/skills/`.
+
+| Preset | Skills |
+|--------|--------|
+| ✨ All | Everything |
+| 🌐 Fullstack | frontend, backend, pm, qa, debug, commit |
+| 🎨 Frontend | frontend, pm, qa, debug, commit |
+| ⚙️ Backend | backend, pm, qa, debug, commit |
+| 📱 Mobile | mobile, pm, qa, debug, commit |
+
+### Option 2: Using vercel-labs/skills
+
+```bash
+npx skills add first-fluke/oh-my-antigravity
+```
+
+### Option 3: Clone & Open
+
+```bash
+git clone https://github.com/first-fluke/oh-my-antigravity
 cd oh-my-antigravity
 antigravity open .
 ```
 
 Antigravity automatically detects skills in `.agent/skills/`.
-
-### Using with Existing Projects
-
-If you already have an Antigravity project, just copy the skills:
-
-```bash
-# Option 1: Skills only
-cp -r oh-my-antigravity/.agent/skills /path/to/your-project/.agent/
-
-# Option 2: Skills + dashboards
-cp -r oh-my-antigravity/.agent/skills /path/to/your-project/.agent/
-cp -r oh-my-antigravity/scripts/dashboard* /path/to/your-project/scripts/
-cp oh-my-antigravity/package.json /path/to/your-project/  # merge dependencies
-
-# Option 3: Specific skills only
-cp -r oh-my-antigravity/.agent/skills/backend-agent /path/to/your-project/.agent/skills/
-cp -r oh-my-antigravity/.agent/skills/frontend-agent /path/to/your-project/.agent/skills/
-```
-
-Then in your project:
-```bash
-cd /path/to/your-project
-npm install  # if using dashboards
-antigravity open .
-```
-
-All skills are now available in your project!
 
 ### 2. Initial Setup (Optional)
 
@@ -100,12 +131,13 @@ This creates `.agent/config/user-preferences.yaml` for your project.
 ### 3. Monitor with Dashboards
 
 ```bash
-# Terminal dashboard (real-time)
-npm run dashboard
-
-# Web dashboard (browser UI)
-npm run dashboard:web
+# Via CLI (no install required)
+bunx oh-my-antigravity dashboard
 # → http://localhost:9847
+
+# Or via npm scripts (if cloned)
+npm run dashboard      # Terminal dashboard
+npm run dashboard:web  # Web dashboard
 ```
 
 ## How It Works
