@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { Command } from "commander";
 import * as p from "@clack/prompts";
 import pc from "picocolors";
 import { existsSync, mkdirSync, readFileSync, writeFileSync, readdirSync } from "node:fs";
@@ -9,30 +10,9 @@ import pMap from "p-map";
 import { startDashboard } from "./dashboard";
 import { startTerminalDashboard } from "./terminal-dashboard";
 
-const args = process.argv.slice(2);
-const jsonMode = args.includes("--json");
-const resetMode = args.includes("--reset");
-
-if (args[0] === "dashboard") {
-  startTerminalDashboard();
-} else if (args[0] === "dashboard:web") {
-  startDashboard();
-} else if (args[0] === "update") {
-  update().catch(console.error);
-} else if (args[0] === "doctor") {
-  doctor(jsonMode).catch(console.error);
-} else if (args[0] === "stats") {
-  stats(jsonMode, resetMode).catch(console.error);
-} else if (args[0] === "retro") {
-  retro(jsonMode).catch(console.error);
-} else if (args[0] === "help" || args[0] === "--help" || args[0] === "-h") {
-  showHelp();
-} else {
-  main().catch(console.error);
-}
-
 const REPO = "first-fluke/oh-my-ag";
 const GITHUB_RAW = `https://raw.githubusercontent.com/${REPO}/main/.agent/skills`;
+const VERSION = "1.1.1";
 
 const SKILLS = {
   domain: [
@@ -60,6 +40,7 @@ const PRESETS: Record<string, string[]> = {
   all: [...SKILLS.domain, ...SKILLS.coordination, ...SKILLS.utility].map((s) => s.name),
 };
 
+// Skill installation functions
 async function fetchSkillFiles(skillName: string): Promise<string[]> {
   const files = ["SKILL.md"];
   const resourceFiles = [
@@ -101,6 +82,30 @@ async function installSkill(skillName: string, targetDir: string): Promise<boole
   return true;
 }
 
+async function installShared(targetDir: string): Promise<void> {
+  const sharedDir = join(targetDir, ".agent", "skills", "_shared");
+  const files = [
+    "reasoning-templates.md",
+    "clarification-protocol.md",
+    "context-loading.md",
+    "skill-routing.md",
+  ];
+
+  if (!existsSync(sharedDir)) {
+    mkdirSync(sharedDir, { recursive: true });
+  }
+
+  for (const file of files) {
+    const url = `${GITHUB_RAW}/_shared/${file}`;
+    const res = await fetch(url);
+    if (!res.ok) continue;
+
+    const content = await res.text();
+    writeFileSync(join(sharedDir, file), content, "utf-8");
+  }
+}
+
+// Manifest and update functions
 function calculateSHA256(content: string): string {
   return createHash("sha256").update(content, "utf-8").digest("hex");
 }
@@ -186,6 +191,7 @@ async function downloadFile(manifestFile: ManifestFile): Promise<{ path: string;
   return { path: manifestFile.path, success: true };
 }
 
+// Command implementations
 async function update(): Promise<void> {
   console.clear();
   p.intro(pc.bgMagenta(pc.white(" 🛸 oh-my-ag update ")));
@@ -240,29 +246,7 @@ async function update(): Promise<void> {
   }
 }
 
-async function installShared(targetDir: string): Promise<void> {
-  const sharedDir = join(targetDir, ".agent", "skills", "_shared");
-  const files = [
-    "reasoning-templates.md",
-    "clarification-protocol.md",
-    "context-loading.md",
-    "skill-routing.md",
-  ];
-
-  if (!existsSync(sharedDir)) {
-    mkdirSync(sharedDir, { recursive: true });
-  }
-
-  for (const file of files) {
-    const url = `${GITHUB_RAW}/_shared/${file}`;
-    const res = await fetch(url);
-    if (!res.ok) continue;
-
-    const content = await res.text();
-    writeFileSync(join(sharedDir, file), content, "utf-8");
-  }
-}
-
+// Doctor command
 interface CLICheck {
   name: string;
   installed: boolean;
@@ -624,6 +608,7 @@ async function doctor(jsonMode = false): Promise<void> {
   }
 }
 
+// Stats command
 interface Metrics {
   sessions: number;
   skillsUsed: Record<string, number>;
@@ -636,33 +621,8 @@ interface Metrics {
   startDate: string;
 }
 
-interface Retrospective {
-  id: string;
-  date: string;
-  summary: string;
-  keyLearnings: string[];
-  filesChanged: string[];
-  nextSteps: string[];
-}
-
 function getMetricsPath(cwd: string): string {
   return join(cwd, ".serena", "metrics.json");
-}
-
-function getRetroPath(cwd: string): string {
-  return join(cwd, ".serena", "retrospectives");
-}
-
-function loadMetrics(cwd: string): Metrics {
-  const metricsPath = getMetricsPath(cwd);
-  if (existsSync(metricsPath)) {
-    try {
-      return JSON.parse(readFileSync(metricsPath, "utf-8"));
-    } catch {
-      return createEmptyMetrics();
-    }
-  }
-  return createEmptyMetrics();
 }
 
 function createEmptyMetrics(): Metrics {
@@ -677,6 +637,18 @@ function createEmptyMetrics(): Metrics {
     lastUpdated: new Date().toISOString(),
     startDate: new Date().toISOString(),
   };
+}
+
+function loadMetrics(cwd: string): Metrics {
+  const metricsPath = getMetricsPath(cwd);
+  if (existsSync(metricsPath)) {
+    try {
+      return JSON.parse(readFileSync(metricsPath, "utf-8"));
+    } catch {
+      return createEmptyMetrics();
+    }
+  }
+  return createEmptyMetrics();
 }
 
 function saveMetrics(cwd: string, metrics: Metrics): void {
@@ -810,6 +782,20 @@ async function stats(jsonMode = false, resetMode = false): Promise<void> {
   }
 
   p.outro(pc.dim(`Data stored in: ${metricsPath}`));
+}
+
+// Retro command
+interface Retrospective {
+  id: string;
+  date: string;
+  summary: string;
+  keyLearnings: string[];
+  filesChanged: string[];
+  nextSteps: string[];
+}
+
+function getRetroPath(cwd: string): string {
+  return join(cwd, ".serena", "retrospectives");
 }
 
 function loadRetrospectives(cwd: string): Retrospective[] {
@@ -982,53 +968,234 @@ async function retro(jsonMode = false): Promise<void> {
   p.outro(pc.dim(`Stored in: ${retroDir}`));
 }
 
-function showHelp(): void {
-  console.log(`
-${pc.bold("🛸 oh-my-ag")} - Multi-Agent Skills for Antigravity IDE
-
-${pc.bold("USAGE:")}
-  bunx oh-my-ag [command]
-
-${pc.bold("COMMANDS:")}
-  ${pc.cyan("<no command>")}    Interactive CLI - install skills with prompts
-  ${pc.cyan("dashboard")}      Start terminal dashboard (real-time agent monitoring)
-  ${pc.cyan("dashboard:web")}  Start web dashboard on http://localhost:9847
-  ${pc.cyan("update")}         Update skills to latest version from registry
-  ${pc.cyan("doctor")}         Check CLI installations, MCP configs, and skill status
-  ${pc.cyan("stats")}          View productivity metrics
-  ${pc.cyan("retro")}          Session retrospective (learnings & next steps)
-  ${pc.cyan("help")}           Show this help message
-
-${pc.bold("OPTIONS:")}
-  ${pc.cyan("--json")}         Output as JSON (for doctor, stats, retro)
-  ${pc.cyan("--reset")}        Reset data (for stats)
-
-${pc.bold("PRESETS:")}
-  ✨ all       - Install all available skills
-  🌐 fullstack - Frontend + Backend + PM + QA + Debug + Commit
-  🎨 frontend  - Frontend + PM + QA + Debug + Commit
-  ⚙️ backend   - Backend + PM + QA + Debug + Commit
-  📱 mobile    - Mobile + PM + QA + Debug + Commit
-
-${pc.bold("EXAMPLES:")}
-  bunx oh-my-ag                    # Interactive mode
-  bunx oh-my-ag dashboard          # Terminal dashboard
-  bunx oh-my-ag dashboard:web      # Web dashboard
-  bunx oh-my-ag update             # Update skills
-  bunx oh-my-ag doctor             # Check setup
-  bunx oh-my-ag doctor --json      # JSON output for CI/CD
-  bunx oh-my-ag stats              # View productivity metrics
-  bunx oh-my-ag stats --reset      # Reset metrics
-  bunx oh-my-ag retro              # Create session retrospective
-
-${pc.dim("For more info: https://github.com/first-fluke/oh-my-ag")}
-
-${pc.bold("❤️  Enjoying this project?")}
-  ${pc.dim("gh api --method PUT /user/starred/first-fluke/oh-my-ag")}
-`);
+// Cleanup command
+interface CleanupResult {
+  cleaned: number;
+  skipped: number;
+  details: string[];
 }
 
-async function main() {
+async function cleanup(dryRun = false, jsonMode = false): Promise<void> {
+  const cwd = process.cwd();
+  const resultsDir = join(cwd, ".agent", "results");
+  const tmpDir = "/tmp";
+
+  const result: CleanupResult = {
+    cleaned: 0,
+    skipped: 0,
+    details: [],
+  };
+
+  const logAction = (msg: string) => {
+    result.details.push(dryRun ? `[DRY-RUN] ${msg}` : `[CLEAN] ${msg}`);
+    result.cleaned++;
+  };
+
+  const logSkip = (msg: string) => {
+    result.details.push(`[SKIP] ${msg}`);
+    result.skipped++;
+  };
+
+  // Step 1: Clean up /tmp/subagent-*.pid files
+  try {
+    const pidFiles = readdirSync(tmpDir).filter((f) => f.startsWith("subagent-") && f.endsWith(".pid"));
+
+    for (const pidFile of pidFiles) {
+      const pidPath = join(tmpDir, pidFile);
+      const pidContent = readFileSync(pidPath, "utf-8").trim();
+
+      if (!pidContent) {
+        logAction(`Removing empty PID file: ${pidPath}`);
+        if (!dryRun) {
+          try {
+            execSync(`rm -f "${pidPath}"`);
+          } catch {}
+        }
+        continue;
+      }
+
+      const pid = parseInt(pidContent, 10);
+      if (isNaN(pid)) {
+        logAction(`Removing invalid PID file: ${pidPath}`);
+        if (!dryRun) {
+          try {
+            execSync(`rm -f "${pidPath}"`);
+          } catch {}
+        }
+        continue;
+      }
+
+      // Check if process is running
+      try {
+        execSync(`kill -0 ${pid} 2>/dev/null`);
+        // Process is running - kill it
+        logAction(`Killing orphaned process PID=${pid} (from ${pidPath})`);
+        if (!dryRun) {
+          try {
+            execSync(`kill ${pid} 2>/dev/null || true`);
+            // Wait briefly, then force-kill if still alive
+            await new Promise((resolve) => setTimeout(resolve, 1000));
+            try {
+              execSync(`kill -0 ${pid} 2>/dev/null`);
+              execSync(`kill -9 ${pid} 2>/dev/null || true`);
+            } catch {
+              // Process already dead
+            }
+            execSync(`rm -f "${pidPath}"`);
+          } catch {}
+        }
+      } catch {
+        // Process not running - just remove stale PID file
+        logAction(`Removing stale PID file (process gone): ${pidPath}`);
+        if (!dryRun) {
+          try {
+            execSync(`rm -f "${pidPath}"`);
+          } catch {}
+        }
+      }
+    }
+  } catch {
+    // /tmp directory might not be accessible
+  }
+
+  // Step 2: Clean up /tmp/subagent-*.log files
+  try {
+    const logFiles = readdirSync(tmpDir).filter((f) => f.startsWith("subagent-") && f.endsWith(".log"));
+
+    for (const logFile of logFiles) {
+      const logPath = join(tmpDir, logFile);
+      const pidFile = logFile.replace(".log", ".pid");
+      const pidPath = join(tmpDir, pidFile);
+
+      // Check if there's a matching PID file with a running process
+      if (existsSync(pidPath)) {
+        try {
+          const pidContent = readFileSync(pidPath, "utf-8").trim();
+          const pid = parseInt(pidContent, 10);
+          if (!isNaN(pid)) {
+            execSync(`kill -0 ${pid} 2>/dev/null`);
+            logSkip(`Log file has active process: ${logPath}`);
+            continue;
+          }
+        } catch {
+          // Process not running or invalid PID
+        }
+      }
+
+      logAction(`Removing stale log file: ${logPath}`);
+      if (!dryRun) {
+        try {
+          execSync(`rm -f "${logPath}"`);
+        } catch {}
+      }
+    }
+  } catch {
+    // /tmp directory might not be accessible
+  }
+
+  // Step 3: Clean up parallel-run PID list files
+  if (existsSync(resultsDir)) {
+    try {
+      const parallelDirs = readdirSync(resultsDir).filter((d) => d.startsWith("parallel-"));
+
+      for (const parallelDir of parallelDirs) {
+        const pidsPath = join(resultsDir, parallelDir, "pids.txt");
+        if (!existsSync(pidsPath)) continue;
+
+        const pidsContent = readFileSync(pidsPath, "utf-8");
+        const lines = pidsContent.split("\n").filter((l) => l.trim());
+
+        let hasRunning = false;
+        for (const line of lines) {
+          const [pidStr, agent] = line.split(":");
+          const pid = parseInt(pidStr?.trim() || "", 10);
+          if (isNaN(pid)) continue;
+
+          try {
+            execSync(`kill -0 ${pid} 2>/dev/null`);
+            hasRunning = true;
+            logAction(`Killing orphaned parallel agent PID=${pid} (${agent?.trim() || "unknown"})`);
+            if (!dryRun) {
+              try {
+                execSync(`kill ${pid} 2>/dev/null || true`);
+              execSync(`rm -f "${pidsPath}"`);
+              } catch {}
+            }
+          } catch {
+            // Process not running
+          }
+        }
+
+        if (!hasRunning) {
+          logAction(`Removing stale PID list: ${pidsPath}`);
+          if (!dryRun) {
+            try {
+              execSync(`rm -f "${pidsPath}"`);
+            } catch {}
+          }
+        } else {
+          // Give processes time to die, then clean up
+          if (!dryRun) {
+            await new Promise((resolve) => setTimeout(resolve, 1000));
+            try {
+              execSync(`rm -f "${pidsPath}"`);
+            } catch {}
+          }
+        }
+      }
+    } catch {
+      // Error reading results directory
+    }
+  } else {
+    logSkip(`No results directory found: ${resultsDir}`);
+  }
+
+  if (jsonMode) {
+    console.log(JSON.stringify(result, null, 2));
+    return;
+  }
+
+  console.clear();
+  p.intro(pc.bgMagenta(pc.white(" 🧹 oh-my-ag cleanup ")));
+
+  if (dryRun) {
+    p.note(pc.yellow("Dry-run mode — no changes will be made"), "Mode");
+  }
+
+  if (result.details.length > 0) {
+    const detailsTable = [
+      pc.bold("Cleanup Details"),
+      ...result.details.map((d) => {
+        if (d.startsWith("[DRY-RUN]")) return pc.yellow(d);
+        if (d.startsWith("[CLEAN]")) return pc.green(d);
+        return pc.cyan(d);
+      }),
+    ].join("\n");
+
+    p.note(detailsTable, "Details");
+  }
+
+  const summaryTable = [
+    pc.bold("Summary"),
+    `┌─────────┬────────┐`,
+    `│ ${pc.bold("Action")}  │ ${pc.bold("Count")}  │`,
+    `├─────────┼────────┤`,
+    `│ Cleaned │ ${String(result.cleaned).padEnd(6)} │`,
+    `│ Skipped │ ${String(result.skipped).padEnd(6)} │`,
+    `└─────────┴────────┘`,
+  ].join("\n");
+
+  p.note(summaryTable, "Results");
+
+  if (dryRun) {
+    p.outro(pc.yellow("Run without --dry-run to apply changes"));
+  } else {
+    p.outro(pc.green("Cleanup complete!"));
+  }
+}
+
+// Interactive main command
+async function main(): Promise<void> {
   console.clear();
   p.intro(pc.bgMagenta(pc.white(" 🛸 oh-my-ag ")));
 
@@ -1107,3 +1274,71 @@ async function main() {
     process.exit(1);
   }
 }
+
+// Commander.js setup
+const program = new Command();
+
+program
+  .name("oh-my-ag")
+  .description("Multi-Agent Skills for Antigravity IDE")
+  .version(VERSION)
+  .action(() => {
+    main().catch(console.error);
+  });
+
+program
+  .command("dashboard")
+  .description("Start terminal dashboard (real-time agent monitoring)")
+  .action(() => {
+    startTerminalDashboard();
+  });
+
+program
+  .command("dashboard:web")
+  .description("Start web dashboard on http://localhost:9847")
+  .action(() => {
+    startDashboard();
+  });
+
+program
+  .command("update")
+  .description("Update skills to latest version from registry")
+  .action(() => {
+    update().catch(console.error);
+  });
+
+program
+  .command("doctor")
+  .description("Check CLI installations, MCP configs, and skill status")
+  .option("--json", "Output as JSON for CI/CD")
+  .action((options) => {
+    doctor(options.json).catch(console.error);
+  });
+
+program
+  .command("stats")
+  .description("View productivity metrics")
+  .option("--json", "Output as JSON")
+  .option("--reset", "Reset metrics data")
+  .action((options) => {
+    stats(options.json, options.reset).catch(console.error);
+  });
+
+program
+  .command("retro")
+  .description("Session retrospective (learnings & next steps)")
+  .option("--json", "Output as JSON")
+  .action((options) => {
+    retro(options.json).catch(console.error);
+  });
+
+program
+  .command("cleanup")
+  .description("Clean up orphaned subagent processes and temp files")
+  .option("--dry-run", "Show what would be cleaned without making changes")
+  .option("--json", "Output as JSON")
+  .action((options) => {
+    cleanup(options.dryRun, options.json).catch(console.error);
+  });
+
+program.parse();
