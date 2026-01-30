@@ -4,8 +4,13 @@
 1. **Assess difficulty** — see `../_shared/difficulty-guide.md`
    - **Simple**: Skip to Step 3 | **Medium**: All 4 steps | **Complex**: All steps + checkpoints
 2. **Check lessons** — read your domain section in `../_shared/lessons-learned.md`
-3. **Use reasoning templates** — for Complex bugs, use `../_shared/reasoning-templates.md` (hypothesis loop, execution trace)
-4. **Budget context** — follow `../_shared/context-budget.md` (use find_symbol, not read_file)
+3. **Clarify requirements** — follow `../_shared/clarification-protocol.md`
+   - Check **Uncertainty Triggers**: 보안/인증 관련 버그, 기존 코드 충돌 가능성?
+   - Determine level: LOW → proceed | MEDIUM → present options | HIGH → ask immediately
+4. **Use reasoning templates** — for Complex bugs, use `../_shared/reasoning-templates.md` (hypothesis loop, execution trace)
+5. **Budget context** — follow `../_shared/context-budget.md` (use find_symbol, not read_file)
+
+**⚠️ Intelligent Escalation**: When uncertain, escalate early. Don't blindly proceed.
 
 Follow these steps in order (adjust depth by difficulty).
 

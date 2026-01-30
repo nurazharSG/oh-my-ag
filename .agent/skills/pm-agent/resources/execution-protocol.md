@@ -4,8 +4,12 @@
 1. **Assess difficulty** — see `../_shared/difficulty-guide.md`
    - **Simple**: Lightweight plan, 3-5 tasks | **Medium**: Full 4 steps | **Complex**: Full + API contracts
 2. **Clarify requirements** — follow `../_shared/clarification-protocol.md` (critical for PM)
+   - Check **Uncertainty Triggers**: 비즈니스 로직, 보안/인증, 기존 코드 충돌?
+   - Determine level: LOW → proceed | MEDIUM → present options | HIGH → ask immediately
 3. **Use reasoning templates** — for architecture decisions, use `../_shared/reasoning-templates.md` (decision matrix)
 4. **Check lessons** — read cross-domain section in `../_shared/lessons-learned.md`
+
+**⚠️ Intelligent Escalation**: When uncertain, escalate early. Don't blindly proceed.
 
 Follow these steps in order (adjust depth by difficulty).
 
