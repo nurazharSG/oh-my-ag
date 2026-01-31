@@ -79,7 +79,7 @@ get_vendor_config() {
 # Get CLI for specific agent type from user-preferences.yaml
 get_agent_cli() {
     local agent_type="$1"
-    local prefs="${SCRIPT_DIR}/../../config/user-preferences.yaml"
+    local prefs="${SCRIPT_DIR}/../../../config/user-preferences.yaml"
     if [[ -f "$prefs" ]]; then
         grep -A10 "^agent_cli_mapping:" "$prefs" 2>/dev/null | \
             grep "^  ${agent_type}:" | \
@@ -89,7 +89,7 @@ get_agent_cli() {
 
 # Get default CLI from user-preferences.yaml
 get_default_cli() {
-    local prefs="${SCRIPT_DIR}/../../config/user-preferences.yaml"
+    local prefs="${SCRIPT_DIR}/../../../config/user-preferences.yaml"
     if [[ -f "$prefs" ]]; then
         grep "^default_cli:" "$prefs" 2>/dev/null | sed 's/^[^:]*: *//' | tr -d '"' | xargs
     fi
