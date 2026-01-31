@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.3.0](https://github.com/first-fluke/oh-my-ag/compare/oh-my-ag-v1.2.0...oh-my-ag-v1.3.0) (2026-01-31)
+
+
+### Features
+
+* **backend-agent:** enhance with Repository/Service/Router pattern ([f11be01](https://github.com/first-fluke/oh-my-ag/commit/f11be01eb2c886ae30d0f24a3e15cab18b99aba7))
+* **frontend-agent:** merge frontend-engineer content with FSD-lite architecture ([34a1e6f](https://github.com/first-fluke/oh-my-ag/commit/34a1e6f1bacd8470df9f551485fae2aa81eb69e7))
+
+
+### Bug Fixes
+
+* **orchestrator:** correct user-preferences.yaml path in spawn-agent.sh ([d4f507d](https://github.com/first-fluke/oh-my-ag/commit/d4f507d6aa0492eaa00c33d1a8281e7326bf6890))
+
 ## [1.2.0](https://github.com/first-fluke/oh-my-ag/compare/oh-my-ag-v1.1.1...oh-my-ag-v1.2.0) (2026-01-30)
 
 
