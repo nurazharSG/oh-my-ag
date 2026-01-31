@@ -428,10 +428,10 @@ For SubAgent Orchestrator, at least one CLI tool:
 
 | CLI | Install | Auth |
 |-----|---------|------|
-| Gemini | `npm i -g @anthropic-ai/gemini-cli` | `gemini auth` |
-| Claude | `npm i -g @anthropic-ai/claude-code` | `claude auth` |
-| Codex | `npm i -g @openai/codex` | `codex auth` |
-| Qwen | `pip install qwen-cli` | `qwen auth` |
+| Gemini | `bun install --global @anthropic-ai/gemini-cli` | `gemini auth` |
+| Claude | `bun install --global @anthropic-ai/claude-code` | `claude auth` |
+| Codex | `bun install --global @openai/codex` | `codex auth` |
+| Qwen | `bun install --global @qwen-code/qwen` | `qwen auth` |
 
 ## CLI Commands
 

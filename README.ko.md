@@ -398,10 +398,10 @@ SubAgent Orchestrator를 사용하려면 최소 1개의 CLI 도구 필요:
 
 | CLI | 설치 | 인증 |
 |-----|------|------|
-| Gemini | `npm i -g @anthropic-ai/gemini-cli` | `gemini auth` |
-| Claude | `npm i -g @anthropic-ai/claude-code` | `claude auth` |
-| Codex | `npm i -g @openai/codex` | `codex auth` |
-| Qwen | `pip install qwen-cli` | `qwen auth` |
+| Gemini | `bun install --global @anthropic-ai/gemini-cli` | `gemini auth` |
+| Claude | `bun install --global @anthropic-ai/claude-code` | `claude auth` |
+| Codex | `bun install --global @openai/codex` | `codex auth` |
+| Qwen | `bun install --global @qwen-code/qwen` | `qwen auth` |
 
 ## CLI 명령어
 
