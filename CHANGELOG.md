@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.5.2](https://github.com/first-fluke/oh-my-ag/compare/oh-my-ag-v1.5.1...oh-my-ag-v1.5.2) (2026-02-01)
+
+
+### Documentation
+
+* **commit:** translate skill documentation to English ([3bb62c1](https://github.com/first-fluke/oh-my-ag/commit/3bb62c10e0a4640fc9f5b65071c3be3c063a9216))
+* translate Korean comments to English ([752948c](https://github.com/first-fluke/oh-my-ag/commit/752948cd27d3c0901db5ee3c6441ff00d2afc04d))
+
 ## [1.5.1](https://github.com/first-fluke/oh-my-ag/compare/oh-my-ag-v1.5.0...oh-my-ag-v1.5.1) (2026-02-01)
 
 
