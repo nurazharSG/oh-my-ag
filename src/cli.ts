@@ -1,13 +1,14 @@
 #!/usr/bin/env node
 import { Command } from "commander";
+import { bridge } from "./commands/bridge.js";
+import { cleanup } from "./commands/cleanup.js";
+import { doctor } from "./commands/doctor.js";
+import { install } from "./commands/install.js";
+import { retro } from "./commands/retro.js";
+import { stats } from "./commands/stats.js";
+import { update } from "./commands/update.js";
 import { startDashboard } from "./dashboard.js";
 import { startTerminalDashboard } from "./terminal-dashboard.js";
-import { install } from "./commands/install.js";
-import { update } from "./commands/update.js";
-import { doctor } from "./commands/doctor.js";
-import { stats } from "./commands/stats.js";
-import { retro } from "./commands/retro.js";
-import { cleanup } from "./commands/cleanup.js";
 
 const VERSION = "1.1.1";
 
@@ -75,6 +76,13 @@ program
   .option("--json", "Output as JSON")
   .action((options) => {
     cleanup(options.dryRun, options.json).catch(console.error);
+  });
+
+program
+  .command("bridge [url]")
+  .description("Bridge MCP stdio to SSE (for Serena)")
+  .action((url) => {
+    bridge(url).catch(console.error);
   });
 
 program.parse();

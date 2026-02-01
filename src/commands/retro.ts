@@ -1,10 +1,27 @@
-import { existsSync, mkdirSync, writeFileSync, readdirSync, readFileSync } from "node:fs";
+import {
+  existsSync,
+  mkdirSync,
+  readdirSync,
+  readFileSync,
+  writeFileSync,
+} from "node:fs";
 import { join } from "node:path";
 import * as p from "@clack/prompts";
 import pc from "picocolors";
+import {
+  getCommitsSince,
+  getCommitTypes,
+  getGitStats,
+  getLastRetroDate,
+  getRecentChangedFiles,
+  getRecentGitCommits,
+} from "../lib/git.js";
+import {
+  extractKeyLearningsFromActivities,
+  getRecentAgentActivities,
+  getSessionSummary,
+} from "../lib/memory.js";
 import type { Retrospective } from "../types/index.js";
-import { getRecentGitCommits, getRecentChangedFiles, getGitStats, getCommitMessages, getCommitTypes, getLastRetroDate, getCommitsSince } from "../lib/git.js";
-import { getSessionSummary, extractKeyLearningsFromActivities, getRecentAgentActivities } from "../lib/memory.js";
 
 function getRetroPath(cwd: string): string {
   return join(cwd, ".serena", "retrospectives");
@@ -15,8 +32,13 @@ function loadRetrospectives(cwd: string): Retrospective[] {
   if (!existsSync(retroDir)) return [];
 
   try {
-    const files = readdirSync(retroDir).filter((f) => f.endsWith(".json")).sort().reverse();
-    return files.slice(0, 10).map((f) => JSON.parse(readFileSync(join(retroDir, f), "utf-8")));
+    const files = readdirSync(retroDir)
+      .filter((f) => f.endsWith(".json"))
+      .sort()
+      .reverse();
+    return files
+      .slice(0, 10)
+      .map((f) => JSON.parse(readFileSync(join(retroDir, f), "utf-8")));
   } catch {
     return [];
   }
@@ -28,10 +50,18 @@ function saveRetrospective(cwd: string, retro: Retrospective): void {
     mkdirSync(retroDir, { recursive: true });
   }
   const filename = `${retro.date.replace(/[:.]/g, "-")}_${retro.id}.json`;
-  writeFileSync(join(retroDir, filename), JSON.stringify(retro, null, 2), "utf-8");
+  writeFileSync(
+    join(retroDir, filename),
+    JSON.stringify(retro, null, 2),
+    "utf-8",
+  );
 }
 
-function generateAutoSummary(cwd: string): { summary: string; learnings: string[]; nextSteps: string[] } {
+function generateAutoSummary(cwd: string): {
+  summary: string;
+  learnings: string[];
+  nextSteps: string[];
+} {
   const lastRetroDate = getLastRetroDate(cwd);
   const commits = getCommitsSince(cwd, lastRetroDate);
   const commitTypes = getCommitTypes(commits);
@@ -95,10 +125,17 @@ function generateAutoSummary(cwd: string): { summary: string; learnings: string[
     nextSteps.push("Continue development", "Review and test changes");
   }
 
-  return { summary, learnings: learnings.slice(0, 5), nextSteps: nextSteps.slice(0, 5) };
+  return {
+    summary,
+    learnings: learnings.slice(0, 5),
+    nextSteps: nextSteps.slice(0, 5),
+  };
 }
 
-export async function retro(jsonMode = false, interactive = false): Promise<void> {
+export async function retro(
+  jsonMode = false,
+  interactive = false,
+): Promise<void> {
   const cwd = process.cwd();
   const retroDir = getRetroPath(cwd);
   const existingRetros = loadRetrospectives(cwd);
@@ -139,7 +176,7 @@ export async function retro(jsonMode = false, interactive = false): Promise<void
         pc.bold("Next Steps:"),
         ...nextSteps.map((s) => `  → ${s}`),
       ].join("\n"),
-      "Saved"
+      "Saved",
     );
 
     p.outro(pc.dim(`Stored in: ${retroDir}`));
@@ -165,15 +202,23 @@ export async function retro(jsonMode = false, interactive = false): Promise<void
         pc.bold("Next Steps:"),
         ...recentRetro.nextSteps.map((s) => `  → ${s}`),
       ].join("\n"),
-      "Previous Session"
+      "Previous Session",
     );
   }
 
   const action = await p.select({
     message: "What would you like to do?",
     options: [
-      { value: "auto", label: "✨ Auto-generate from git history", hint: "Analyze commits and agent activity" },
-      { value: "manual", label: "📝 Create manually", hint: "Write your own retrospective" },
+      {
+        value: "auto",
+        label: "✨ Auto-generate from git history",
+        hint: "Analyze commits and agent activity",
+      },
+      {
+        value: "manual",
+        label: "📝 Create manually",
+        hint: "Write your own retrospective",
+      },
       { value: "list", label: "📋 View past retrospectives" },
       { value: "exit", label: "👋 Exit" },
     ],
@@ -188,7 +233,12 @@ export async function retro(jsonMode = false, interactive = false): Promise<void
     if (existingRetros.length === 0) {
       p.note(pc.yellow("No retrospectives found."), "History");
     } else {
-      const list = existingRetros.map((r, i) => `${i + 1}. [${r.date.split("T")[0]}] ${r.summary.slice(0, 50)}...`).join("\n");
+      const list = existingRetros
+        .map(
+          (r, i) =>
+            `${i + 1}. [${r.date.split("T")[0]}] ${r.summary.slice(0, 50)}...`,
+        )
+        .join("\n");
       p.note(list, `📚 Past Retrospectives (${existingRetros.length})`);
     }
     p.outro(pc.dim(`Stored in: ${retroDir}`));
@@ -212,7 +262,7 @@ export async function retro(jsonMode = false, interactive = false): Promise<void
         pc.bold("Next Steps:"),
         ...nextSteps.map((s) => `  → ${s}`),
       ].join("\n"),
-      "Preview"
+      "Preview",
     );
 
     const shouldSave = await p.confirm({
@@ -244,7 +294,7 @@ export async function retro(jsonMode = false, interactive = false): Promise<void
         `Learnings: ${newRetro.keyLearnings.length} items`,
         `Next steps: ${newRetro.nextSteps.length} items`,
       ].join("\n"),
-      "Saved"
+      "Saved",
     );
 
     p.outro(pc.dim(`Stored in: ${retroDir}`));
@@ -295,9 +345,15 @@ export async function retro(jsonMode = false, interactive = false): Promise<void
     id: Math.random().toString(36).slice(2, 8),
     date: new Date().toISOString(),
     summary: summary as string,
-    keyLearnings: (learningsInput as string).split(",").map((s) => s.trim()).filter(Boolean),
+    keyLearnings: (learningsInput as string)
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean),
     filesChanged: changedFiles,
-    nextSteps: (nextStepsInput as string).split(",").map((s) => s.trim()).filter(Boolean),
+    nextSteps: (nextStepsInput as string)
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean),
   };
 
   saveRetrospective(cwd, newRetro);
@@ -310,7 +366,7 @@ export async function retro(jsonMode = false, interactive = false): Promise<void
       `Learnings: ${newRetro.keyLearnings.length} items`,
       `Next steps: ${newRetro.nextSteps.length} items`,
     ].join("\n"),
-    "Saved"
+    "Saved",
   );
 
   p.outro(pc.dim(`Stored in: ${retroDir}`));

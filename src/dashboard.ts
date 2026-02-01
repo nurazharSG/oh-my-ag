@@ -1,11 +1,19 @@
-import { watch } from "chokidar";
+import {
+  existsSync,
+  mkdirSync,
+  readdirSync,
+  readFileSync,
+  statSync,
+} from "node:fs";
 import { createServer } from "node:http";
-import { readFileSync, existsSync, readdirSync, statSync, mkdirSync } from "node:fs";
-import { join, basename } from "node:path";
-import { WebSocketServer, WebSocket } from "ws";
-import pc from "picocolors";
+import { basename, join } from "node:path";
+import { watch } from "chokidar";
+import * as pc from "picocolors";
+import { WebSocket, WebSocketServer } from "ws";
 
-const PORT = process.env.DASHBOARD_PORT ? parseInt(process.env.DASHBOARD_PORT) : 9847;
+const PORT = process.env.DASHBOARD_PORT
+  ? parseInt(process.env.DASHBOARD_PORT || "9847", 10)
+  : 9847;
 
 function resolveMemoriesDir(): string {
   if (process.env.MEMORIES_DIR) return process.env.MEMORIES_DIR;
@@ -32,7 +40,7 @@ function findSessionFile(memoriesDir: string): string | null {
       .filter((f) => /^session-.*\.md$/.test(f))
       .map((f) => ({ name: f, mtime: statSync(join(memoriesDir, f)).mtimeMs }))
       .sort((a, b) => b.mtime - a.mtime);
-    if (sessionFiles.length > 0) {
+    if (sessionFiles.length > 0 && sessionFiles[0]) {
       return join(memoriesDir, sessionFiles[0].name);
     }
   } catch {}
@@ -46,7 +54,7 @@ function parseSessionInfo(memoriesDir: string) {
   const content = readFileSafe(sessionFile);
   if (!content) return { id: "N/A", status: "UNKNOWN" };
 
-  let id =
+  const id =
     (content.match(/session-id:\s*(.+)/i) || [])[1] ||
     (content.match(/# Session:\s*(.+)/i) || [])[1] ||
     content.match(/(session-\d{8}-\d{6})/)?.[1] ||
@@ -75,9 +83,17 @@ function parseTaskBoard(memoriesDir: string) {
   const lines = content.split("\n");
   for (const line of lines) {
     if (!line.startsWith("|") || /^\|\s*-+/.test(line)) continue;
-    const cols = line.split("|").map((c) => c.trim()).filter(Boolean);
-    if (cols.length < 2 || /^agent$/i.test(cols[0])) continue;
-    agents.push({ agent: cols[0] || "", status: cols[1] || "pending", task: cols[2] || "" });
+    const cols = line
+      .split("|")
+      .map((c) => c.trim())
+      .filter(Boolean);
+    const agentName = cols[0];
+    if (cols.length < 2 || !agentName || /^agent$/i.test(agentName)) continue;
+    agents.push({
+      agent: cols[0] || "",
+      status: cols[1] || "pending",
+      task: cols[2] || "",
+    });
   }
   return agents;
 }
@@ -86,11 +102,12 @@ function getAgentTurn(memoriesDir: string, agent: string): number | null {
   try {
     const files = readdirSync(memoriesDir)
       .filter((f) => f.startsWith(`progress-${agent}`) && f.endsWith(".md"))
-      .sort().reverse();
+      .sort()
+      .reverse();
     if (files.length === 0) return null;
-    const content = readFileSafe(join(memoriesDir, files[0]));
+    const content = files[0] ? readFileSafe(join(memoriesDir, files[0])) : "";
     const match = content.match(/turn[:\s]*(\d+)/i);
-    return match ? parseInt(match[1], 10) : null;
+    return match?.[1] ? parseInt(match[1], 10) : null;
   } catch {
     return null;
   }
@@ -104,33 +121,52 @@ function getLatestActivity(memoriesDir: string) {
       .sort((a, b) => b.mtime - a.mtime)
       .slice(0, 10);
 
-    return files.map((f) => {
-      const name = f.name
-        .replace(/^(progress|result|session|debug|task)-?/, "")
-        .replace(/[-_]agent/, "").replace(/[-_]completion/, "")
-        .replace(/\.md$/, "").replace(/[-_]/g, " ").trim() || f.name.replace(/\.md$/, "");
+    return files
+      .map((f) => {
+        const name =
+          f.name
+            .replace(/^(progress|result|session|debug|task)-?/, "")
+            .replace(/[-_]agent/, "")
+            .replace(/[-_]completion/, "")
+            .replace(/\.md$/, "")
+            .replace(/[-_]/g, " ")
+            .trim() || f.name.replace(/\.md$/, "");
 
-      const content = readFileSafe(join(memoriesDir, f.name));
-      const lines = content.split("\n").map((l) => l.trim()).filter((l) => l && !l.startsWith("---") && l.length > 3);
+        const content = readFileSafe(join(memoriesDir, f.name));
+        const lines = content
+          .split("\n")
+          .map((l) => l.trim())
+          .filter((l) => l && !l.startsWith("---") && l.length > 3);
 
-      let message = "";
-      for (let i = lines.length - 1; i >= 0; i--) {
-        const line = lines[i];
-        if (/^\*\*|^#+|^-|^\d+\.|Status|Result|Action|Step/i.test(line)) {
-          message = line.replace(/^[#*\-\d.]+\s*/, "").replace(/\*\*/g, "").trim();
-          if (message.length > 5) break;
+        let message = "";
+        for (let i = lines.length - 1; i >= 0; i--) {
+          const line = lines[i];
+          if (line) {
+            if (/^\*\*|^#+|^-|^\d+\.|Status|Result|Action|Step/i.test(line)) {
+              message = line
+                .replace(/^[#*\-\d.]+\s*/, "")
+                .replace(/\*\*/g, "")
+                .trim();
+              if (message.length > 5) break;
+            }
+          }
         }
-      }
-      if (message.length > 80) message = message.substring(0, 77) + "...";
-      return { agent: name, message, file: f.name };
-    }).filter((a) => a.message);
+        if (message.length > 80) message = `${message.substring(0, 77)}...`;
+        return { agent: name, message, file: f.name };
+      })
+      .filter((a) => a.message);
   } catch {
     return [];
   }
 }
 
 function discoverAgentsFromFiles(memoriesDir: string) {
-  const agents: { agent: string; status: string; task: string; turn: number | null }[] = [];
+  const agents: {
+    agent: string;
+    status: string;
+    task: string;
+    turn: number | null;
+  }[] = [];
   const seen = new Set<string>();
 
   try {
@@ -141,29 +177,41 @@ function discoverAgentsFromFiles(memoriesDir: string) {
 
     for (const f of files) {
       const content = readFileSafe(join(memoriesDir, f.name));
-      const agentMatch = content.match(/\*\*Agent\*\*:\s*(.+)/i) ||
-                         content.match(/Agent:\s*(.+)/i) ||
-                         content.match(/^#+\s*(.+?)\s*Agent/im);
+      const agentMatch =
+        content.match(/\*\*Agent\*\*:\s*(.+)/i) ||
+        content.match(/Agent:\s*(.+)/i) ||
+        content.match(/^#+\s*(.+?)\s*Agent/im);
 
       let agentName: string | null = null;
-      if (agentMatch) {
+      if (agentMatch?.[1]) {
         agentName = agentMatch[1].trim();
       } else if (/_agent|agent_|-agent/i.test(f.name)) {
-        agentName = f.name.replace(/\.md$/, "")
+        agentName = f.name
+          .replace(/\.md$/, "")
           .replace(/[-_]completion|[-_]progress|[-_]result/gi, "")
-          .replace(/[-_]/g, " ").trim();
+          .replace(/[-_]/g, " ")
+          .trim();
       }
 
       if (agentName && !seen.has(agentName.toLowerCase())) {
         seen.add(agentName.toLowerCase());
         let status = "unknown";
-        if (/\[COMPLETED\]|## Completed|## Results/i.test(content)) status = "completed";
-        else if (/\[IN PROGRESS\]|## Progress|IN PROGRESS/i.test(content)) status = "running";
+        if (/\[COMPLETED\]|## Completed|## Results/i.test(content))
+          status = "completed";
+        else if (/\[IN PROGRESS\]|## Progress|IN PROGRESS/i.test(content))
+          status = "running";
         else if (/\[FAILED\]|## Failed|ERROR/i.test(content)) status = "failed";
 
-        const taskMatch = content.match(/## Task\s*\n+(.+)/i) || content.match(/\*\*Task\*\*:\s*(.+)/i);
-        const task = taskMatch ? taskMatch[1].trim().substring(0, 60) : "";
-        agents.push({ agent: agentName, status, task, turn: getAgentTurn(memoriesDir, agentName) });
+        const taskMatch =
+          content.match(/## Task\s*\n+(.+)/i) ||
+          content.match(/\*\*Task\*\*:\s*(.+)/i);
+        const task = taskMatch?.[1] ? taskMatch[1].trim().substring(0, 60) : "";
+        agents.push({
+          agent: agentName,
+          status,
+          task,
+          turn: getAgentTurn(memoriesDir, agentName),
+        });
       }
     }
   } catch {}
@@ -173,20 +221,36 @@ function discoverAgentsFromFiles(memoriesDir: string) {
 function buildFullState(memoriesDir: string) {
   const session = parseSessionInfo(memoriesDir);
   const taskBoard = parseTaskBoard(memoriesDir);
-  let agents = taskBoard.map((a) => ({ ...a, turn: getAgentTurn(memoriesDir, a.agent) }));
+  let agents = taskBoard.map((a) => ({
+    ...a,
+    turn: getAgentTurn(memoriesDir, a.agent),
+  }));
 
   if (agents.length === 0) agents = discoverAgentsFromFiles(memoriesDir);
   if (agents.length === 0) {
     try {
-      const progressFiles = readdirSync(memoriesDir).filter((f) => f.startsWith("progress-") && f.endsWith(".md"));
+      const progressFiles = readdirSync(memoriesDir).filter(
+        (f) => f.startsWith("progress-") && f.endsWith(".md"),
+      );
       for (const f of progressFiles) {
         const agent = f.replace(/^progress-/, "").replace(/\.md$/, "");
-        agents.push({ agent, status: "running", task: "", turn: getAgentTurn(memoriesDir, agent) });
+        agents.push({
+          agent,
+          status: "running",
+          task: "",
+          turn: getAgentTurn(memoriesDir, agent),
+        });
       }
     } catch {}
   }
 
-  return { session, agents, activity: getLatestActivity(memoriesDir), memoriesDir, updatedAt: new Date().toISOString() };
+  return {
+    session,
+    agents,
+    activity: getLatestActivity(memoriesDir),
+    memoriesDir,
+    updatedAt: new Date().toISOString(),
+  };
 }
 
 const HTML = `<!DOCTYPE html>
@@ -268,20 +332,41 @@ export function startDashboard() {
   function broadcast(event?: string, file?: string) {
     if (debounceTimer) clearTimeout(debounceTimer);
     debounceTimer = setTimeout(() => {
-      const msg = JSON.stringify({ type: "update", event, file, data: buildFullState(memoriesDir) });
-      wss.clients.forEach((c) => { if (c.readyState === WebSocket.OPEN) c.send(msg); });
+      const msg = JSON.stringify({
+        type: "update",
+        event,
+        file,
+        data: buildFullState(memoriesDir),
+      });
+      wss.clients.forEach((c) => {
+        if (c.readyState === WebSocket.OPEN) c.send(msg);
+      });
     }, 100);
   }
 
-  const watcher = watch(memoriesDir, { persistent: true, ignoreInitial: true, awaitWriteFinish: { stabilityThreshold: 200, pollInterval: 50 } });
+  const watcher = watch(memoriesDir, {
+    persistent: true,
+    ignoreInitial: true,
+    awaitWriteFinish: { stabilityThreshold: 200, pollInterval: 50 },
+  });
   watcher.on("all", (event, filePath) => broadcast(event, basename(filePath)));
 
   wss.on("connection", (ws) => {
-    ws.send(JSON.stringify({ type: "full", data: buildFullState(memoriesDir) }));
+    ws.send(
+      JSON.stringify({ type: "full", data: buildFullState(memoriesDir) }),
+    );
     ws.on("error", () => ws.terminate());
   });
 
-  process.on("SIGINT", () => { console.log("\nShutting down..."); watcher.close(); wss.clients.forEach((c) => c.terminate()); wss.close(() => server.close(() => process.exit(0))); setTimeout(() => process.exit(1), 3000).unref(); });
+  process.on("SIGINT", () => {
+    console.log("\nShutting down...");
+    watcher.close();
+    wss.clients.forEach((c) => {
+      c.terminate();
+    });
+    wss.close(() => server.close(() => process.exit(0)));
+    setTimeout(() => process.exit(1), 3000).unref();
+  });
   process.on("SIGTERM", () => process.emit("SIGINT"));
 
   server.listen(PORT, () => {

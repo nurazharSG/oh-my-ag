@@ -1,12 +1,19 @@
 import { execSync } from "node:child_process";
 
-export function getGitStats(cwd: string): { filesChanged: number; linesAdded: number; linesRemoved: number } {
+export function getGitStats(cwd: string): {
+  filesChanged: number;
+  linesAdded: number;
+  linesRemoved: number;
+} {
   try {
-    const diffStat = execSync("git diff --stat HEAD~10 2>/dev/null || git diff --stat", {
-      cwd,
-      encoding: "utf-8",
-      stdio: ["pipe", "pipe", "ignore"],
-    });
+    const diffStat = execSync(
+      "git diff --stat HEAD~10 2>/dev/null || git diff --stat",
+      {
+        cwd,
+        encoding: "utf-8",
+        stdio: ["pipe", "pipe", "ignore"],
+      },
+    );
 
     const lines = diffStat.trim().split("\n");
     const summaryLine = lines[lines.length - 1] || "";
@@ -40,11 +47,14 @@ export function getRecentGitCommits(cwd: string, limit = 5): string[] {
 
 export function getRecentChangedFiles(cwd: string): string[] {
   try {
-    const files = execSync("git diff --name-only HEAD~5 2>/dev/null || git diff --name-only", {
-      cwd,
-      encoding: "utf-8",
-      stdio: ["pipe", "pipe", "ignore"],
-    });
+    const files = execSync(
+      "git diff --name-only HEAD~5 2>/dev/null || git diff --name-only",
+      {
+        cwd,
+        encoding: "utf-8",
+        stdio: ["pipe", "pipe", "ignore"],
+      },
+    );
     return files.trim().split("\n").filter(Boolean).slice(0, 10);
   } catch {
     return [];
@@ -78,7 +88,8 @@ export function getCommitMessages(cwd: string, limit = 10): string[] {
 
 export function getCommitTypes(commits: string[]): Record<string, number> {
   const types: Record<string, number> = {};
-  const typePattern = /^(feat|fix|docs|style|refactor|test|chore|build|ci|perf)(\(.+\))?:/;
+  const typePattern =
+    /^(feat|fix|docs|style|refactor|test|chore|build|ci|perf)(\(.+\))?:/;
 
   for (const commit of commits) {
     const match = commit.match(typePattern);
@@ -113,7 +124,10 @@ export function getLastRetroDate(cwd: string): string | null {
   }
 }
 
-export function getCommitsSince(cwd: string, sinceDate: string | null): string[] {
+export function getCommitsSince(
+  cwd: string,
+  sinceDate: string | null,
+): string[] {
   if (!sinceDate) {
     return getCommitMessages(cwd, 10);
   }
@@ -122,11 +136,14 @@ export function getCommitsSince(cwd: string, sinceDate: string | null): string[]
     const date = new Date(sinceDate);
     const isoDate = date.toISOString().split("T")[0];
 
-    const logs = execSync(`git log --format="%s" --since="${isoDate}" 2>/dev/null`, {
-      cwd,
-      encoding: "utf-8",
-      stdio: ["pipe", "pipe", "ignore"],
-    });
+    const logs = execSync(
+      `git log --format="%s" --since="${isoDate}" 2>/dev/null`,
+      {
+        cwd,
+        encoding: "utf-8",
+        stdio: ["pipe", "pipe", "ignore"],
+      },
+    );
 
     return logs.trim().split("\n").filter(Boolean);
   } catch {

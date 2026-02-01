@@ -1,7 +1,12 @@
 import * as p from "@clack/prompts";
-import pc from "picocolors";
 import pMap from "p-map";
-import { fetchRemoteManifest, downloadFile, getLocalVersion, saveLocalVersion } from "../lib/manifest.js";
+import pc from "picocolors";
+import {
+  downloadFile,
+  fetchRemoteManifest,
+  getLocalVersion,
+  saveLocalVersion,
+} from "../lib/manifest.js";
 
 export async function update(): Promise<void> {
   console.clear();
@@ -22,12 +27,14 @@ export async function update(): Promise<void> {
       return;
     }
 
-    spinner.message(`Updating from ${localVersion || "not installed"} to ${pc.cyan(remoteManifest.version)}...`);
+    spinner.message(
+      `Updating from ${localVersion || "not installed"} to ${pc.cyan(remoteManifest.version)}...`,
+    );
 
     const results = await pMap(
       remoteManifest.files,
       async (file) => downloadFile(file),
-      { concurrency: 10 }
+      { concurrency: 10 },
     );
 
     const failures = results.filter((r) => !r.success);
@@ -36,7 +43,7 @@ export async function update(): Promise<void> {
       spinner.stop("Update completed with errors");
       p.note(
         failures.map((f) => `${pc.red("✗")} ${f.path}: ${f.error}`).join("\n"),
-        `${failures.length} files failed`
+        `${failures.length} files failed`,
       );
     } else {
       spinner.stop(`Updated to version ${pc.cyan(remoteManifest.version)}!`);
@@ -48,7 +55,7 @@ export async function update(): Promise<void> {
     p.outro(
       failures.length > 0
         ? `${successCount} files updated, ${failures.length} failed`
-        : `${successCount} files updated successfully`
+        : `${successCount} files updated successfully`,
     );
   } catch (error) {
     spinner.stop("Update failed");

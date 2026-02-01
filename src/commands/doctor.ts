@@ -1,23 +1,35 @@
-import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { execSync } from "node:child_process";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import * as p from "@clack/prompts";
 import pc from "picocolors";
+import { getAllSkills, installShared, installSkill } from "../lib/skills.js";
 import type { CLICheck, SkillCheck } from "../types/index.js";
-import { SKILLS, installSkill, installShared, getAllSkills } from "../lib/skills.js";
 
-async function checkCLI(name: string, command: string, installCmd: string): Promise<CLICheck> {
+async function checkCLI(
+  name: string,
+  command: string,
+  installCmd: string,
+): Promise<CLICheck> {
   try {
-    const version = execSync(`${command} --version`, { encoding: "utf-8", stdio: ["pipe", "pipe", "ignore"] }).trim();
+    const version = execSync(`${command} --version`, {
+      encoding: "utf-8",
+      stdio: ["pipe", "pipe", "ignore"],
+    }).trim();
     return { name, installed: true, version, installCmd };
   } catch {
     return { name, installed: false, installCmd };
   }
 }
 
-async function checkMCPConfig(cliName: string): Promise<{ configured: boolean; path?: string }> {
+async function checkMCPConfig(
+  cliName: string,
+): Promise<{ configured: boolean; path?: string }> {
   const homeDir = process.env.HOME || process.env.USERPROFILE || "";
-  const configs: Record<string, { path: string; type: "json" | "yaml" | "toml" }> = {
+  const configs: Record<
+    string,
+    { path: string; type: "json" | "yaml" | "toml" }
+  > = {
     gemini: { path: `${homeDir}/.gemini/settings.json`, type: "json" },
     claude: { path: `${homeDir}/.claude.json`, type: "json" },
     codex: { path: `${homeDir}/.codex/config.toml`, type: "toml" },
@@ -68,17 +80,27 @@ export async function doctor(jsonMode = false): Promise<void> {
   const cwd = process.cwd();
 
   const clis = await Promise.all([
-    checkCLI("gemini", "gemini", "bun install --global @anthropic-ai/gemini-cli"),
-    checkCLI("claude", "claude", "bun install --global @anthropic-ai/claude-code"),
+    checkCLI(
+      "gemini",
+      "gemini",
+      "bun install --global @anthropic-ai/gemini-cli",
+    ),
+    checkCLI(
+      "claude",
+      "claude",
+      "bun install --global @anthropic-ai/claude-code",
+    ),
     checkCLI("codex", "codex", "bun install --global @openai/codex"),
     checkCLI("qwen", "qwen", "bun install --global @qwen-code/qwen-code"),
   ]);
 
   const mcpChecks = await Promise.all(
-    clis.filter((c) => c.installed).map(async (cli) => {
-      const mcp = await checkMCPConfig(cli.name);
-      return { ...cli, mcp };
-    })
+    clis
+      .filter((c) => c.installed)
+      .map(async (cli) => {
+        const mcp = await checkMCPConfig(cli.name);
+        return { ...cli, mcp };
+      }),
   );
 
   const skillChecks = await checkSkills();
@@ -93,9 +115,14 @@ export async function doctor(jsonMode = false): Promise<void> {
   }
 
   const missingCLIs = clis.filter((c) => !c.installed);
-  const missingSkills = skillChecks.length > 0
-    ? skillChecks.filter((s) => !s.installed || !s.hasSkillMd)
-    : getAllSkills().map((s) => ({ name: s.name, installed: false, hasSkillMd: false }));
+  const missingSkills =
+    skillChecks.length > 0
+      ? skillChecks.filter((s) => !s.installed || !s.hasSkillMd)
+      : getAllSkills().map((s) => ({
+          name: s.name,
+          installed: false,
+          hasSkillMd: false,
+        }));
 
   const totalIssues =
     missingCLIs.length +
@@ -106,11 +133,24 @@ export async function doctor(jsonMode = false): Promise<void> {
     const result = {
       ok: totalIssues === 0,
       issues: totalIssues,
-      clis: clis.map((c) => ({ name: c.name, installed: c.installed, version: c.version || null })),
-      mcp: mcpChecks.map((c) => ({ name: c.name, configured: c.mcp.configured, path: c.mcp.path || null })),
-      skills: skillChecks.length > 0
-        ? skillChecks.map((s) => ({ name: s.name, installed: s.installed, complete: s.hasSkillMd }))
-        : [],
+      clis: clis.map((c) => ({
+        name: c.name,
+        installed: c.installed,
+        version: c.version || null,
+      })),
+      mcp: mcpChecks.map((c) => ({
+        name: c.name,
+        configured: c.mcp.configured,
+        path: c.mcp.path || null,
+      })),
+      skills:
+        skillChecks.length > 0
+          ? skillChecks.map((s) => ({
+              name: s.name,
+              installed: s.installed,
+              complete: s.hasSkillMd,
+            }))
+          : [],
       missingSkills: missingSkills.map((s) => s.name),
       serena: { exists: hasSerena, fileCount: serenaFileCount },
     };
@@ -130,7 +170,9 @@ export async function doctor(jsonMode = false): Promise<void> {
       `│ ${pc.bold("CLI")}     │ ${pc.bold("Status")}     │ ${pc.bold("Version")}       │`,
       "├─────────┼──────────┼─────────────┤",
       ...clis.map((cli) => {
-        const status = cli.installed ? pc.green("✅ Installed") : pc.red("❌ Missing");
+        const status = cli.installed
+          ? pc.green("✅ Installed")
+          : pc.red("❌ Missing");
         const version = cli.version || "-";
         return `│ ${cli.name.padEnd(7)} │ ${status.padEnd(8)} │ ${version.padEnd(11)} │`;
       }),
@@ -141,8 +183,12 @@ export async function doctor(jsonMode = false): Promise<void> {
 
     if (missingCLIs.length > 0) {
       p.note(
-        missingCLIs.map((cli) => `${pc.yellow("→")} ${cli.name}: ${pc.dim(cli.installCmd)}`).join("\n"),
-        "Install missing CLIs"
+        missingCLIs
+          .map(
+            (cli) => `${pc.yellow("→")} ${cli.name}: ${pc.dim(cli.installCmd)}`,
+          )
+          .join("\n"),
+        "Install missing CLIs",
       );
     }
 
@@ -153,7 +199,9 @@ export async function doctor(jsonMode = false): Promise<void> {
         `│ ${pc.bold("CLI")}     │ ${pc.bold("MCP Config")} │ ${pc.bold("Path")}                │`,
         "├─────────┼──────────┼─────────────────────┤",
         ...mcpChecks.map((cli) => {
-          const status = cli.mcp.configured ? pc.green("✅ Configured") : pc.yellow("⚠️  Not configured");
+          const status = cli.mcp.configured
+            ? pc.green("✅ Configured")
+            : pc.yellow("⚠️  Not configured");
           const path = cli.mcp.path ? cli.mcp.path.split("/").pop() || "" : "-";
           return `│ ${cli.name.padEnd(7)} │ ${status.padEnd(8)} │ ${path.padEnd(19)} │`;
         }),
@@ -168,7 +216,9 @@ export async function doctor(jsonMode = false): Promise<void> {
 
     if (skillChecks.length > 0) {
       const skillTable = [
-        pc.bold(`📦 Skills (${installedCount}/${skillChecks.length} installed, ${completeCount} complete)`),
+        pc.bold(
+          `📦 Skills (${installedCount}/${skillChecks.length} installed, ${completeCount} complete)`,
+        ),
         "┌────────────────────┬──────────┬─────────────┐",
         `│ ${pc.bold("Skill")}                │ ${pc.bold("Installed")} │ ${pc.bold("SKILL.md")}    │`,
         "├────────────────────┼──────────┼─────────────┤",
@@ -202,7 +252,11 @@ export async function doctor(jsonMode = false): Promise<void> {
         const selectMode = await p.select({
           message: "Which skills to install?",
           options: [
-            { value: "all", label: `✨ All (${allSkillNames.length} skills)`, hint: "Recommended" },
+            {
+              value: "all",
+              label: `✨ All (${allSkillNames.length} skills)`,
+              hint: "Recommended",
+            },
             { value: "select", label: "🔧 Select individually" },
           ],
         });
@@ -251,7 +305,7 @@ export async function doctor(jsonMode = false): Promise<void> {
           spinner.stop(`Installed ${skillsToInstall.length} skill(s)!`);
           p.note(
             skillsToInstall.map((s) => `${pc.green("✓")} ${s}`).join("\n"),
-            "Installed Skills"
+            "Installed Skills",
           );
         } catch (error) {
           spinner.stop("Installation failed");
@@ -263,19 +317,21 @@ export async function doctor(jsonMode = false): Promise<void> {
     if (hasSerena) {
       p.note(
         `${pc.green("✅")} Serena memory directory exists\n${pc.dim(`${serenaFileCount} memory files found`)}`,
-        "Serena Memory"
+        "Serena Memory",
       );
     } else {
       p.note(
         `${pc.yellow("⚠️")} Serena memory directory not found\n${pc.dim("Dashboard will show 'No agents detected'")}`,
-        "Serena Memory"
+        "Serena Memory",
       );
     }
 
     if (totalIssues === 0) {
       p.outro(pc.green("✅ All checks passed! Ready to use."));
     } else {
-      p.outro(pc.yellow(`⚠️  Found ${totalIssues} issue(s). See details above.`));
+      p.outro(
+        pc.yellow(`⚠️  Found ${totalIssues} issue(s). See details above.`),
+      );
     }
   } catch (error) {
     if (spinner) spinner.stop("Check failed");

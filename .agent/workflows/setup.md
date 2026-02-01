@@ -25,6 +25,7 @@ description: Initial setup workflow — verify CLI installations, check MCP conn
 ## Step 2: CLI Installation Status
 
 Check each CLI installation:
+
 ```bash
 which gemini && gemini --version
 which claude && claude --version
@@ -32,6 +33,7 @@ which codex && codex --version
 ```
 
 Display results:
+
 ```
 🔍 CLI Installation Status
 ┌─────────┬───────────┬─────────────┐
@@ -44,6 +46,7 @@ Display results:
 ```
 
 Provide installation guide for missing CLIs:
+
 - **gemini**: `npm install -g @anthropic-ai/gemini-cli`
 - **claude**: `npm install -g @anthropic-ai/claude-code`
 - **codex**: `npm install -g @openai/codex-cli`
@@ -61,6 +64,7 @@ Provide installation guide for missing CLIs:
 3. Test Serena MCP connection
 
 Display results:
+
 ```
 🔗 MCP Connection Status
 ┌─────────────────┬────────────┬─────────────────────┐
@@ -74,6 +78,7 @@ Display results:
 ```
 
 For missing MCP settings:
+
 - Display configuration instructions
 - Offer automatic setup option
 
@@ -89,6 +94,7 @@ For missing MCP settings:
 Serena runs as a subprocess for each session. No separate server needed.
 
 **Gemini CLI** (`~/.gemini/settings.json`):
+
 ```json
 {
   "mcpServers": {
@@ -101,6 +107,7 @@ Serena runs as a subprocess for each session. No separate server needed.
 ```
 
 **Antigravity IDE** (`~/.gemini/antigravity/mcp_config.json`):
+
 ```json
 {
   "mcpServers": {
@@ -118,11 +125,13 @@ Serena runs as a subprocess for each session. No separate server needed.
 Serena runs as a shared SSE server. Multiple sessions can share one server instance.
 
 **1. Start Serena server:**
+
 ```bash
 serena-mcp-server --port 12341
 ```
 
 **2. Gemini CLI** (`~/.gemini/settings.json`):
+
 ```json
 {
   "mcpServers": {
@@ -133,18 +142,19 @@ serena-mcp-server --port 12341
 }
 ```
 
-**3. Antigravity IDE** — requires bridge script:
+**3. Antigravity IDE** — requires bridge:
 
 > **Important**: Antigravity IDE doesn't support SSE directly.
-> You need the `mcp-sse-bridge.js` script to connect.
+> You need the `bridge` command to connect.
 
 **Configure** (`~/.gemini/antigravity/mcp_config.json`):
+
 ```json
 {
   "mcpServers": {
     "serena": {
-      "command": "node",
-      "args": ["/path/to/oh-my-ag/scripts/mcp-sse-bridge.js"],
+      "command": "npx",
+      "args": ["-y", "oh-my-ag@latest", "bridge", "http://localhost:12341/sse"],
       "disabled": false
     }
   }
@@ -152,9 +162,10 @@ serena-mcp-server --port 12341
 ```
 
 **Bridge Architecture:**
+
 ```
 ┌─────────────────┐     stdio      ┌──────────────────┐     HTTP/SSE     ┌─────────────────┐
-│ Antigravity IDE │ ◄────────────► │ mcp-sse-bridge.js│ ◄──────────────► │ Serena SSE      │
+│ Antigravity IDE │ ◄────────────► │  oh-my-ag bridge │ ◄──────────────► │ Serena SSE      │
 └─────────────────┘                └──────────────────┘                  └─────────────────┘
                                                                           (localhost:12341)
 ```
@@ -172,6 +183,7 @@ serena-mcp-server --port 12341
 
 1. Display current mapping
 2. Ask if user wants to change:
+
    ```
    Current Agent-CLI Mapping:
    ┌──────────┬─────────┐
@@ -218,6 +230,7 @@ serena-mcp-server --port 12341
 ```
 
 If Antigravity IDE with SSE mode:
+
 ```
 💡 For Antigravity IDE (SSE mode):
 - Start Serena server: serena-mcp-server --port 12341

@@ -24,11 +24,20 @@ export const SKILLS: SkillsRegistry = {
 };
 
 export const PRESETS: Record<string, string[]> = {
-  fullstack: ["frontend-agent", "backend-agent", "pm-agent", "qa-agent", "debug-agent", "commit"],
+  fullstack: [
+    "frontend-agent",
+    "backend-agent",
+    "pm-agent",
+    "qa-agent",
+    "debug-agent",
+    "commit",
+  ],
   frontend: ["frontend-agent", "pm-agent", "qa-agent", "debug-agent", "commit"],
   backend: ["backend-agent", "pm-agent", "qa-agent", "debug-agent", "commit"],
   mobile: ["mobile-agent", "pm-agent", "qa-agent", "debug-agent", "commit"],
-  all: [...SKILLS.domain, ...SKILLS.coordination, ...SKILLS.utility].map((s) => s.name),
+  all: [...SKILLS.domain, ...SKILLS.coordination, ...SKILLS.utility].map(
+    (s) => s.name,
+  ),
 };
 
 export async function fetchSkillFiles(skillName: string): Promise<string[]> {
@@ -50,7 +59,10 @@ export async function fetchSkillFiles(skillName: string): Promise<string[]> {
   return files;
 }
 
-export async function installSkill(skillName: string, targetDir: string): Promise<boolean> {
+export async function installSkill(
+  skillName: string,
+  targetDir: string,
+): Promise<boolean> {
   const skillDir = join(targetDir, ".agent", "skills", skillName);
   const files = await fetchSkillFiles(skillName);
 

@@ -1,5 +1,5 @@
-import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { execSync } from "node:child_process";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import * as p from "@clack/prompts";
 import pc from "picocolors";
@@ -27,7 +27,9 @@ export async function cleanup(dryRun = false, jsonMode = false): Promise<void> {
   };
 
   try {
-    const pidFiles = readdirSync(tmpDir).filter((f) => f.startsWith("subagent-") && f.endsWith(".pid"));
+    const pidFiles = readdirSync(tmpDir).filter(
+      (f) => f.startsWith("subagent-") && f.endsWith(".pid"),
+    );
 
     for (const pidFile of pidFiles) {
       const pidPath = join(tmpDir, pidFile);
@@ -44,7 +46,7 @@ export async function cleanup(dryRun = false, jsonMode = false): Promise<void> {
       }
 
       const pid = parseInt(pidContent, 10);
-      if (isNaN(pid)) {
+      if (Number.isNaN(pid)) {
         logAction(`Removing invalid PID file: ${pidPath}`);
         if (!dryRun) {
           try {
@@ -80,7 +82,9 @@ export async function cleanup(dryRun = false, jsonMode = false): Promise<void> {
   } catch {}
 
   try {
-    const logFiles = readdirSync(tmpDir).filter((f) => f.startsWith("subagent-") && f.endsWith(".log"));
+    const logFiles = readdirSync(tmpDir).filter(
+      (f) => f.startsWith("subagent-") && f.endsWith(".log"),
+    );
 
     for (const logFile of logFiles) {
       const logPath = join(tmpDir, logFile);
@@ -91,7 +95,7 @@ export async function cleanup(dryRun = false, jsonMode = false): Promise<void> {
         try {
           const pidContent = readFileSync(pidPath, "utf-8").trim();
           const pid = parseInt(pidContent, 10);
-          if (!isNaN(pid)) {
+          if (!Number.isNaN(pid)) {
             execSync(`kill -0 ${pid} 2>/dev/null`);
             logSkip(`Log file has active process: ${logPath}`);
             continue;
@@ -110,7 +114,9 @@ export async function cleanup(dryRun = false, jsonMode = false): Promise<void> {
 
   if (existsSync(resultsDir)) {
     try {
-      const parallelDirs = readdirSync(resultsDir).filter((d) => d.startsWith("parallel-"));
+      const parallelDirs = readdirSync(resultsDir).filter((d) =>
+        d.startsWith("parallel-"),
+      );
 
       for (const parallelDir of parallelDirs) {
         const pidsPath = join(resultsDir, parallelDir, "pids.txt");
@@ -123,12 +129,14 @@ export async function cleanup(dryRun = false, jsonMode = false): Promise<void> {
         for (const line of lines) {
           const [pidStr, agent] = line.split(":");
           const pid = parseInt(pidStr?.trim() || "", 10);
-          if (isNaN(pid)) continue;
+          if (Number.isNaN(pid)) continue;
 
           try {
             execSync(`kill -0 ${pid} 2>/dev/null`);
             hasRunning = true;
-            logAction(`Killing orphaned parallel agent PID=${pid} (${agent?.trim() || "unknown"})`);
+            logAction(
+              `Killing orphaned parallel agent PID=${pid} (${agent?.trim() || "unknown"})`,
+            );
             if (!dryRun) {
               try {
                 execSync(`kill ${pid} 2>/dev/null || true`);

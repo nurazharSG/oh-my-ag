@@ -1,9 +1,15 @@
-import { existsSync, mkdirSync, readFileSync, writeFileSync, readdirSync } from "node:fs";
+import {
+  existsSync,
+  mkdirSync,
+  readdirSync,
+  readFileSync,
+  writeFileSync,
+} from "node:fs";
 import { dirname, join } from "node:path";
 import * as p from "@clack/prompts";
 import pc from "picocolors";
-import type { Metrics } from "../types/index.js";
 import { getGitStats } from "../lib/git.js";
+import type { Metrics } from "../types/index.js";
 
 function getMetricsPath(cwd: string): string {
   return join(cwd, ".serena", "metrics.json");
@@ -65,13 +71,20 @@ function detectSkillsFromMemories(cwd: string): Record<string, number> {
   return skillsUsed;
 }
 
-export async function stats(jsonMode = false, resetMode = false): Promise<void> {
+export async function stats(
+  jsonMode = false,
+  resetMode = false,
+): Promise<void> {
   const cwd = process.cwd();
   const metricsPath = getMetricsPath(cwd);
 
   if (resetMode) {
     if (existsSync(metricsPath)) {
-      writeFileSync(metricsPath, JSON.stringify(createEmptyMetrics(), null, 2), "utf-8");
+      writeFileSync(
+        metricsPath,
+        JSON.stringify(createEmptyMetrics(), null, 2),
+        "utf-8",
+      );
     }
     if (jsonMode) {
       console.log(JSON.stringify({ reset: true }));
@@ -96,16 +109,31 @@ export async function stats(jsonMode = false, resetMode = false): Promise<void> 
 
   saveMetrics(cwd, metrics);
 
-  const daysSinceStart = Math.max(1, Math.ceil((Date.now() - new Date(metrics.startDate).getTime()) / (1000 * 60 * 60 * 24)));
-  const avgSessionTime = metrics.sessions > 0 ? Math.round(metrics.totalSessionTime / metrics.sessions) : 0;
+  const daysSinceStart = Math.max(
+    1,
+    Math.ceil(
+      (Date.now() - new Date(metrics.startDate).getTime()) /
+        (1000 * 60 * 60 * 24),
+    ),
+  );
+  const avgSessionTime =
+    metrics.sessions > 0
+      ? Math.round(metrics.totalSessionTime / metrics.sessions)
+      : 0;
 
   if (jsonMode) {
-    console.log(JSON.stringify({
-      ...metrics,
-      gitStats,
-      daysSinceStart,
-      avgSessionTime,
-    }, null, 2));
+    console.log(
+      JSON.stringify(
+        {
+          ...metrics,
+          gitStats,
+          daysSinceStart,
+          avgSessionTime,
+        },
+        null,
+        2,
+      ),
+    );
     return;
   }
 
@@ -120,8 +148,8 @@ export async function stats(jsonMode = false, resetMode = false): Promise<void> 
     `│ Sessions            │ ${String(metrics.sessions).padEnd(12)} │`,
     `│ Tasks Completed     │ ${String(metrics.tasksCompleted).padEnd(12)} │`,
     `│ Files Changed       │ ${String(metrics.filesChanged).padEnd(12)} │`,
-    `│ Lines Added         │ ${pc.green("+" + metrics.linesAdded).padEnd(12)} │`,
-    `│ Lines Removed       │ ${pc.red("-" + metrics.linesRemoved).padEnd(12)} │`,
+    `│ Lines Added         │ ${pc.green(`+${metrics.linesAdded}`).padEnd(12)} │`,
+    `│ Lines Removed       │ ${pc.red(`-${metrics.linesRemoved}`).padEnd(12)} │`,
     "└─────────────────────┴──────────────┘",
   ].join("\n");
 
@@ -134,7 +162,9 @@ export async function stats(jsonMode = false, resetMode = false): Promise<void> 
   if (sortedSkills.length > 0) {
     const skillsTable = [
       pc.bold("🏆 Top Skills Used"),
-      ...sortedSkills.map(([skill, count], i) => `  ${i + 1}. ${skill} (${count})`),
+      ...sortedSkills.map(
+        ([skill, count], i) => `  ${i + 1}. ${skill} (${count})`,
+      ),
     ].join("\n");
 
     p.note(skillsTable, "Skills");

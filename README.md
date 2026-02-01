@@ -5,14 +5,17 @@
 Professional agent skills for Google Antigravity IDE featuring specialized PM, Frontend, Backend, Mobile, QA, and Debug agents — coordinated through Antigravity's Agent Manager, CLI-based SubAgent Orchestrator, and real-time Serena Memory dashboards.
 
 > **Like this project?** Give it a star!
+>
 > ```bash
 > gh api --method PUT /user/starred/first-fluke/oh-my-ag
 > ```
 >
 > **New to fullstack development?** Try our optimized starter template:
+>
 > ```bash
 > git clone https://github.com/first-fluke/fullstack-starter
 > ```
+>
 > Pre-configured with these skills for instant multi-agent collaboration.
 
 ## Table of Contents
@@ -130,24 +133,28 @@ This creates `.agent/config/user-preferences.yaml` for your project.
 ### 3. Chat
 
 **Simple task** (single agent auto-activates):
+
 ```
 "Create a login form with Tailwind CSS and form validation"
 → frontend-agent activates
 ```
 
 **Complex project** (workflow-guide coordinates):
+
 ```
 "Build a TODO app with user authentication"
 → workflow-guide → PM Agent plans → agents spawned in Agent Manager
 ```
 
 **Explicit coordination** (user-triggered workflow):
+
 ```
 /coordinate
 → Step-by-step: PM planning → agent spawning → QA review
 ```
 
 **Commit changes** (conventional commits):
+
 ```
 /commit
 → Analyze changes, suggest commit type/scope, create commit with Co-Author
@@ -166,6 +173,7 @@ bunx oh-my-ag dashboard:web  # Web dashboard (Node.js)
 ### Progressive Disclosure
 
 You don't manually select skills. Antigravity automatically:
+
 1. Scans your chat request
 2. Matches against skill descriptions in `.agent/skills/`
 3. Loads the relevant skill only when needed
@@ -174,6 +182,7 @@ You don't manually select skills. Antigravity automatically:
 ### Agent Manager UI
 
 For complex projects, use Antigravity's **Agent Manager** (Mission Control):
+
 1. PM Agent creates a plan
 2. You spawn agents in the Agent Manager UI
 3. Agents work in parallel with separate workspaces
@@ -218,6 +227,7 @@ agent_cli_mapping:
 ```
 
 **CLI Resolution Priority**:
+
 1. `--vendor` command line argument
 2. `agent_cli_mapping` from user-preferences.yaml
 3. `default_cli` from user-preferences.yaml
@@ -276,6 +286,7 @@ bunx oh-my-ag dashboard:web
 ```
 
 Features:
+
 - Real-time WebSocket push (no polling)
 - Auto-reconnect on disconnection
 - Purple Serena-themed UI
@@ -382,38 +393,47 @@ Each skill provides domain-specific resources:
 ## Skills Overview
 
 ### workflow-guide
+
 **Triggers**: Complex multi-domain requests
 **Does**: Guides coordination of PM, Frontend, Backend, Mobile, QA agents
 
 ### pm-agent
+
 **Triggers**: "plan this", "break down", "what should we build"
 **Output**: `.agent/plan.json` with tasks, priorities, dependencies
 
 ### frontend-agent
+
 **Triggers**: UI, components, styling, client-side logic
 **Stack**: Next.js 14, TypeScript, Tailwind CSS, shadcn/ui
 
 ### backend-agent
+
 **Triggers**: APIs, databases, authentication
 **Stack**: FastAPI, SQLAlchemy, PostgreSQL, Redis, JWT
 
 ### mobile-agent
+
 **Triggers**: Mobile apps, iOS/Android
 **Stack**: Flutter 3.19+, Dart, Riverpod
 
 ### qa-agent
+
 **Triggers**: "review security", "check performance", "audit"
 **Checks**: OWASP Top 10, Lighthouse, WCAG 2.1 AA
 
 ### debug-agent
+
 **Triggers**: Bug reports, error messages, crashes
 **Output**: Fixed code, regression tests, bug documentation
 
 ### orchestrator
+
 **Triggers**: Programmatic sub-agent execution
 **CLIs**: Gemini, Claude, Codex, Qwen (configurable)
 
 ### commit
+
 **Triggers**: "commit", "커밋해줘", "save changes"
 **Format**: Conventional Commits with Co-Author tag
 **Config**: `.agent/skills/commit/config/commit-config.yaml`
@@ -444,20 +464,25 @@ bunx oh-my-ag stats --reset  # Reset metrics
 bunx oh-my-ag retro          # Session retrospective (learnings & next steps)
 bunx oh-my-ag dashboard      # Terminal real-time dashboard
 bunx oh-my-ag dashboard:web  # Web dashboard (http://localhost:9847)
+bunx oh-my-ag dashboard:web  # Web dashboard (http://localhost:9847)
+bunx oh-my-ag bridge         # Bridge MCP stdio to SSE (for Serena)
 bunx oh-my-ag help           # Show help
 ```
 
 ## Troubleshooting
 
 ### Dashboard shows "No agents detected"
+
 Memory files haven't been created yet. Run the orchestrator or manually create files in `.serena/memories/`.
 
 ### Skills not loading in Antigravity
+
 1. Open project with `antigravity open .`
 2. Verify `.agent/skills/` folder and `SKILL.md` files exist
 3. Restart Antigravity IDE
 
 ### Agents producing incompatible code
+
 1. Review outputs in `.gemini/antigravity/brain/`
 2. Re-spawn one agent referencing the other's output
 3. Use QA Agent for final consistency check

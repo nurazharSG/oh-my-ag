@@ -25,13 +25,18 @@ export function listMemoryFiles(cwd: string): string[] {
   if (!existsSync(memoriesDir)) return [];
 
   try {
-    return readdirSync(memoriesDir).filter((f) => f.endsWith(".md") && f !== ".gitkeep");
+    return readdirSync(memoriesDir).filter(
+      (f) => f.endsWith(".md") && f !== ".gitkeep",
+    );
   } catch {
     return [];
   }
 }
 
-export function parseAgentActivity(filename: string, content: string): AgentActivity | null {
+export function parseAgentActivity(
+  filename: string,
+  content: string,
+): AgentActivity | null {
   const progressMatch = filename.match(/^progress-(\w+)\.md$/);
   const resultMatch = filename.match(/^result-(\w+)\.md$/);
 
@@ -91,13 +96,19 @@ export function getSessionSummary(cwd: string): SessionSummary {
         }
 
         if (activity.type === "result") {
-          const taskMatch = content.match(/task[:\s]+(.+)/i) || content.match(/##\s*(.+)/);
+          const taskMatch =
+            content.match(/task[:\s]+(.+)/i) || content.match(/##\s*(.+)/);
           if (taskMatch) {
             summary.completedTasks.push(taskMatch[1].trim());
           }
         } else if (activity.type === "progress") {
-          const taskMatch = content.match(/current[:\s]+(.+)/i) || content.match(/working on[:\s]+(.+)/i);
-          if (taskMatch && !summary.completedTasks.includes(taskMatch[1].trim())) {
+          const taskMatch =
+            content.match(/current[:\s]+(.+)/i) ||
+            content.match(/working on[:\s]+(.+)/i);
+          if (
+            taskMatch &&
+            !summary.completedTasks.includes(taskMatch[1].trim())
+          ) {
             summary.inProgressTasks.push(taskMatch[1].trim());
           }
         }
@@ -108,13 +119,16 @@ export function getSessionSummary(cwd: string): SessionSummary {
   return summary;
 }
 
-export function getRecentAgentActivities(cwd: string, sinceDate?: string): AgentActivity[] {
+export function getRecentAgentActivities(
+  cwd: string,
+  sinceDate?: string,
+): AgentActivity[] {
   const allActivities: AgentActivity[] = [];
   const memoriesDir = getMemoriesPath(cwd);
 
   if (!existsSync(memoriesDir)) return allActivities;
 
-  const cutoffTime = sinceDate ? new Date(sinceDate).getTime() : 0;
+  const _cutoffTime = sinceDate ? new Date(sinceDate).getTime() : 0;
   const files = listMemoryFiles(cwd);
 
   for (const file of files) {
@@ -122,7 +136,7 @@ export function getRecentAgentActivities(cwd: string, sinceDate?: string): Agent
 
     try {
       const filePath = join(memoriesDir, file);
-      const stats = readFileSync(filePath);
+      const _stats = readFileSync(filePath);
       const content = readFileSync(filePath, "utf-8");
 
       const activity = parseAgentActivity(file, content);
@@ -135,7 +149,9 @@ export function getRecentAgentActivities(cwd: string, sinceDate?: string): Agent
   return allActivities;
 }
 
-export function extractKeyLearningsFromActivities(activities: AgentActivity[]): string[] {
+export function extractKeyLearningsFromActivities(
+  activities: AgentActivity[],
+): string[] {
   const learnings: string[] = [];
 
   for (const activity of activities) {

@@ -3,14 +3,17 @@
 Google Antigravity IDE용 전문 에이전트 스킬 모음. PM, Frontend, Backend, Mobile, QA, Debug 전문 에이전트가 Agent Manager, CLI 기반 SubAgent Orchestrator, 실시간 Serena Memory 대시보드를 통해 협업합니다.
 
 > **마음에 드셨나요?** 스타 눌러주세요!
+>
 > ```bash
 > gh repo star first-fluke/oh-my-ag
 > ```
 >
 > **풀스택 개발이 처음이신가요?** 최적화된 스타터 템플릿으로 시작필보세요:
+>
 > ```bash
 > git clone https://github.com/first-fluke/fullstack-starter
 > ```
+>
 > 이 스킬들이 미리 설정되어 있어 바로 멀티 에이전트 협업이 가능합니다.
 
 ## 목차
@@ -74,6 +77,7 @@ cp -r oh-my-ag/.agent/skills/frontend-agent /path/to/your-project/.agent/skills/
 ```
 
 본인 프로젝트에서:
+
 ```bash
 cd /path/to/your-project
 npm install  # 대시보드 사용할 경우
@@ -94,24 +98,28 @@ antigravity open .
 ### 3. 채팅으로 사용
 
 **간단한 작업** (단일 에이전트 자동 활성화):
+
 ```
 "Tailwind CSS로 로그인 폼 만들어줘"
 → frontend-agent 자동 활성화
 ```
 
 **복잡한 프로젝트** (workflow-guide가 조율):
+
 ```
 "사용자 인증이 있는 TODO 앱 만들어줘"
 → workflow-guide → PM Agent 기획 → Agent Manager에서 에이전트 생성
 ```
 
 **명시적 조율** (유저가 워크플로우 호출):
+
 ```
 /coordinate
 → 단계별: PM 기획 → 에이전트 생성 → QA 검토
 ```
 
 **변경사항 커밋** (Conventional Commits):
+
 ```
 /commit
 → 변경 분석, 커밋 타입/스코프 제안, Co-Author 포함 커밋 생성
@@ -133,6 +141,7 @@ bunx oh-my-ag dashboard:web  # 웹 대시보드 (브라우저 UI)
 ### Progressive Disclosure (점진적 공개)
 
 스킬을 수동으로 선택할 필요 없습니다. Antigravity가 자동으로:
+
 1. 채팅 요청을 분석
 2. `.agent/skills/`의 스킬 설명과 매칭
 3. 필요한 스킬만 컨텍스트에 로드
@@ -141,6 +150,7 @@ bunx oh-my-ag dashboard:web  # 웹 대시보드 (브라우저 UI)
 ### Agent Manager UI
 
 복잡한 프로젝트에는 Antigravity **Agent Manager** (Mission Control)를 사용합니다:
+
 1. PM Agent가 기획서 작성
 2. Agent Manager UI에서 에이전트 생성
 3. 에이전트들이 별도 워크스페이스에서 병렬 작업
@@ -185,6 +195,7 @@ agent_cli_mapping:
 ```
 
 **CLI 우선순위**:
+
 1. `--vendor` 명령줄 인자
 2. `user-preferences.yaml`의 `agent_cli_mapping`
 3. `user-preferences.yaml`의 `default_cli`
@@ -246,6 +257,7 @@ bunx oh-my-ag dashboard:web
 ```
 
 기능:
+
 - WebSocket 실시간 푸시 (폴링 없음)
 - 연결 끊김 시 자동 재연결
 - 볼라색 Serena 테마 UI
@@ -352,38 +364,47 @@ bunx oh-my-ag dashboard:web
 ## 스킬 개요
 
 ### workflow-guide
+
 **발동 조건**: 복잡한 멀티 도메인 요청
 **역할**: PM, Frontend, Backend, Mobile, QA 에이전트 조율 안내
 
 ### pm-agent
+
 **발동 조건**: "기획해줘", "분석해줘", "뭘 만들어야 할까"
 **산출물**: `.agent/plan.json` (태스크, 우선순위, 의존성)
 
 ### frontend-agent
+
 **발동 조건**: UI, 컴포넌트, 스타일링, 클라이언트 로직
 **기술 스택**: Next.js 14, TypeScript, Tailwind CSS, shadcn/ui
 
 ### backend-agent
+
 **발동 조건**: API, 데이터베이스, 인증
 **기술 스택**: FastAPI, SQLAlchemy, PostgreSQL, Redis, JWT
 
 ### mobile-agent
+
 **발동 조건**: 모바일 앱, iOS/Android
 **기술 스택**: Flutter 3.19+, Dart, Riverpod
 
 ### qa-agent
+
 **발동 조건**: "보안 검토해줘", "성능 확인", "감사해줘"
 **검사 항목**: OWASP Top 10, Lighthouse, WCAG 2.1 AA
 
 ### debug-agent
+
 **발동 조건**: 버그 리포트, 에러 메시지, 크래시
 **산출물**: 수정된 코드, 회귀 테스트, 버그 문서
 
 ### orchestrator
+
 **발동 조건**: 프로그래밍 방식의 서브에이전트 실행
 **지원 CLI**: Gemini, Claude, Codex, Qwen (설정 가능)
 
 ### commit
+
 **발동 조건**: "커밋해줘", "commit", "변경사항 저장"
 **형식**: Conventional Commits + Co-Author 태그
 **설정**: `.agent/skills/commit/config/commit-config.yaml`
@@ -414,20 +435,25 @@ bunx oh-my-ag stats --reset  # 메트릭 초기화
 bunx oh-my-ag retro          # 세션 회고 (배운 점 & 다음 단계)
 bunx oh-my-ag dashboard      # 터미널 실시간 대시보드
 bunx oh-my-ag dashboard:web  # 웹 대시보드 (http://localhost:9847)
+bunx oh-my-ag dashboard:web  # 웹 대시보드 (http://localhost:9847)
+bunx oh-my-ag bridge         # MCP stdio - SSE 브릿지 (Serena용)
 bunx oh-my-ag help           # 도움말 표시
 ```
 
 ## 문제 해결
 
 ### 대시보드에 "No agents detected" 표시
+
 메모리 파일이 아직 생성되지 않았습니다. Orchestrator를 실행하거나 `.serena/memories/`에 수동으로 파일을 생성하세요.
 
 ### Antigravity에서 스킬이 로드되지 않음
+
 1. `antigravity open .`으로 프로젝트 열기
 2. `.agent/skills/` 폴더와 `SKILL.md` 파일 확인
 3. Antigravity IDE 재시작
 
 ### 에이전트 간 코드 불일치
+
 1. `.gemini/antigravity/brain/`에서 산출물 검토
 2. 다른 에이전트의 산출물을 참조하여 재생성
 3. QA Agent로 최종 일관성 검사
