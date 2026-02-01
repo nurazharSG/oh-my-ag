@@ -25,7 +25,7 @@ Google Antigravity IDE용 전문 에이전트 스킬 모음. PM, Frontend, Backe
 - [프로젝트 구조](#프로젝트-구조)
 - [스킬 아키텍처](#스킬-아키텍처)
 - [스킬 개요](#스킬-개요)
-- [사전 요구 사항](#사전-요구-사항)
+
 - [CLI 명령어](#cli-명령어)
 - [문제 해결](#문제-해결)
 - [라이선스](#라이선스)
@@ -48,7 +48,48 @@ Google Antigravity IDE용 전문 에이전트 스킬 모음. PM, Frontend, Backe
 
 ## 빠른 시작
 
-### 1. 클론 & 열기
+### 사전 요구 사항
+
+- **Google Antigravity** (2026+)
+- **Bun** (CLI 및 대시보드용)
+
+### 옵션 1: 대화형 CLI (권장)
+
+```bash
+# bun이 없으면 먼저 설치:
+# curl -fsSL https://bun.sh/install | bash
+
+bunx oh-my-ag
+```
+
+프로젝트 타입을 선택하면 `.agent/skills/`에 스킬이 설치됩니다.
+
+| 프리셋 | 스킬 |
+|--------|--------|
+| ✨ All | 전체 |
+| 🌐 Fullstack | frontend, backend, pm, qa, debug, commit |
+| 🎨 Frontend | frontend, pm, qa, debug, commit |
+| ⚙️ Backend | backend, pm, qa, debug, commit |
+| 📱 Mobile | mobile, pm, qa, debug, commit |
+
+### 옵션 2: 전역 설치 (Orchestrator용)
+
+SubAgent Orchestrator를 사용하거나 도구를 전역에서 사용하려면:
+
+```bash
+bun install --global oh-my-ag
+```
+
+최소 1개의 CLI 도구가 필요합니다:
+
+| CLI | 설치 | 인증 |
+|-----|------|------|
+| Gemini | `bun install --global @anthropic-ai/gemini-cli` | `gemini auth` |
+| Claude | `bun install --global @anthropic-ai/claude-code` | `claude auth` |
+| Codex | `bun install --global @openai/codex` | `codex auth` |
+| Qwen | `bun install --global @qwen-code/qwen` | `qwen auth` |
+
+### 옵션 3: 클론 & 열기
 
 ```bash
 git clone <repository-url>
@@ -58,20 +99,20 @@ antigravity open .
 
 Antigravity가 `.agent/skills/`의 스킬을 자동 감지합니다.
 
-### 기존 프로젝트에 통합하기
+### 옵션 4: 기존 프로젝트에 통합하기
 
 이미 Antigravity 프로젝트가 있다면 스킬만 복사하면 됩니다:
 
 ```bash
-# 옵션 1: 스킬만 복사
+# 방법 1: 스킬만 복사
 cp -r oh-my-ag/.agent/skills /path/to/your-project/.agent/
 
-# 옵션 2: 스킬 + 대시보드
+# 방법 2: 스킬 + 대시보드
 cp -r oh-my-ag/.agent/skills /path/to/your-project/.agent/
 
 cp oh-my-ag/package.json /path/to/your-project/  # 의존성 병합
 
-# 옵션 3: 특정 스킬만
+# 방법 3: 특정 스킬만
 cp -r oh-my-ag/.agent/skills/backend-agent /path/to/your-project/.agent/skills/
 cp -r oh-my-ag/.agent/skills/frontend-agent /path/to/your-project/.agent/skills/
 ```
@@ -405,26 +446,6 @@ bunx oh-my-ag dashboard:web
 **발동 조건**: "커밋해줘", "commit", "변경사항 저장"
 **형식**: Conventional Commits + Co-Author 태그
 **설정**: `.agent/skills/commit/config/commit-config.yaml`
-
-## 사전 요구 사항
-
-- **Google Antigravity** (2026+)
-- **Bun** (CLI 및 대시보드용)
-
-SubAgent Orchestrator를 사용하려면 먼저 패키지를 전역으로 설치해야 합니다:
-
-```bash
-bun install --global oh-my-ag
-```
-
-그 후 최소 1개의 CLI 도구가 필요합니다:
-
-| CLI | 설치 | 인증 |
-|-----|------|------|
-| Gemini | `bun install --global @anthropic-ai/gemini-cli` | `gemini auth` |
-| Claude | `bun install --global @anthropic-ai/claude-code` | `claude auth` |
-| Codex | `bun install --global @openai/codex` | `codex auth` |
-| Qwen | `bun install --global @qwen-code/qwen` | `qwen auth` |
 
 ## CLI 명령어
 

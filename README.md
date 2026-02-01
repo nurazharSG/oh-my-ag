@@ -28,7 +28,7 @@ Professional agent skills for Google Antigravity IDE featuring specialized PM, F
 - [Project Structure](#project-structure)
 - [Skill Architecture](#skill-architecture)
 - [Skills Overview](#skills-overview)
-- [Prerequisites](#prerequisites)
+
 - [CLI Commands](#cli-commands)
 - [Troubleshooting](#troubleshooting)
 - [Central Registry](#central-registry-for-multi-repo-setup)
@@ -86,6 +86,11 @@ A collection of **Antigravity Skills** enabling collaborative multi-agent develo
 
 ## Quick Start
 
+### Prerequisites
+
+- **Google Antigravity** (2026+)
+- **Bun** (for CLI and dashboards)
+
 ### Option 1: Interactive CLI (Recommended)
 
 ```bash
@@ -105,13 +110,30 @@ Select your project type and skills will be installed to `.agent/skills/`.
 | ⚙️ Backend | backend, pm, qa, debug, commit |
 | 📱 Mobile | mobile, pm, qa, debug, commit |
 
-### Option 2: Using vercel-labs/skills
+### Option 2: Global Installation (For Orchestrator)
+
+To use the core tools globally or run the SubAgent Orchestrator:
+
+```bash
+bun install --global oh-my-ag
+```
+
+You'll also need at least one CLI tool:
+
+| CLI | Install | Auth |
+|-----|---------|------|
+| Gemini | `bun install --global @anthropic-ai/gemini-cli` | `gemini auth` |
+| Claude | `bun install --global @anthropic-ai/claude-code` | `claude auth` |
+| Codex | `bun install --global @openai/codex` | `codex auth` |
+| Qwen | `bun install --global @qwen-code/qwen` | `qwen auth` |
+
+### Option 3: Using vercel-labs/skills
 
 ```bash
 bunx skills add first-fluke/oh-my-ag
 ```
 
-### Option 3: Clone & Open
+### Option 4: Clone & Open
 
 ```bash
 git clone https://github.com/first-fluke/oh-my-ag
@@ -434,26 +456,6 @@ Each skill provides domain-specific resources:
 **Triggers**: "commit", "커밋해줘", "save changes"
 **Format**: Conventional Commits with Co-Author tag
 **Config**: `.agent/skills/commit/config/commit-config.yaml`
-
-## Prerequisites
-
-- **Google Antigravity** (2026+)
-- **Bun** (for CLI and dashboards)
-
-To use the core tools, install the package globally:
-
-```bash
-bun install --global oh-my-ag
-```
-
-For SubAgent Orchestrator, you'll also need at least one CLI tool:
-
-| CLI | Install | Auth |
-|-----|---------|------|
-| Gemini | `bun install --global @anthropic-ai/gemini-cli` | `gemini auth` |
-| Claude | `bun install --global @anthropic-ai/claude-code` | `claude auth` |
-| Codex | `bun install --global @openai/codex` | `codex auth` |
-| Qwen | `bun install --global @qwen-code/qwen` | `qwen auth` |
 
 ## CLI Commands
 
