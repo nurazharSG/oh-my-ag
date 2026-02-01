@@ -164,3 +164,36 @@ export async function installConfigs(targetDir: string): Promise<void> {
 export function getAllSkills(): SkillInfo[] {
   return [...SKILLS.domain, ...SKILLS.coordination, ...SKILLS.utility];
 }
+
+export async function installGlobalWorkflows(): Promise<void> {
+  const homeDir = process.env.HOME || process.env.USERPROFILE || "";
+  const globalWorkflowsDir = join(
+    homeDir,
+    ".gemini",
+    "antigravity",
+    "global_workflows",
+  );
+
+  if (!existsSync(globalWorkflowsDir)) {
+    mkdirSync(globalWorkflowsDir, { recursive: true });
+  }
+
+  const files = [
+    "coordinate.md",
+    "debug.md",
+    "orchestrate.md",
+    "plan.md",
+    "review.md",
+    "setup.md",
+    "tools.md",
+  ];
+
+  for (const file of files) {
+    const url = `${GITHUB_AGENT_ROOT}/workflows/${file}`;
+    const res = await fetch(url);
+    if (!res.ok) continue;
+
+    const content = await res.text();
+    writeFileSync(join(globalWorkflowsDir, file), content, "utf-8");
+  }
+}

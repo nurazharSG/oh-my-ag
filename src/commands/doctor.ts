@@ -76,6 +76,30 @@ async function checkSkills(): Promise<SkillCheck[]> {
   return checks;
 }
 
+async function checkGlobalWorkflows(): Promise<{
+  installed: boolean;
+  count: number;
+}> {
+  const homeDir = process.env.HOME || process.env.USERPROFILE || "";
+  const globalWorkflowsDir = join(
+    homeDir,
+    ".gemini",
+    "antigravity",
+    "global_workflows",
+  );
+
+  if (!existsSync(globalWorkflowsDir)) return { installed: false, count: 0 };
+
+  try {
+    const files = readdirSync(globalWorkflowsDir).filter((f) =>
+      f.endsWith(".md"),
+    );
+    return { installed: true, count: files.length };
+  } catch {
+    return { installed: false, count: 0 };
+  }
+}
+
 export async function doctor(jsonMode = false): Promise<void> {
   const cwd = process.cwd();
 
@@ -104,6 +128,7 @@ export async function doctor(jsonMode = false): Promise<void> {
   );
 
   const skillChecks = await checkSkills();
+  const globalWorkflows = await checkGlobalWorkflows();
 
   const serenaDir = join(cwd, ".serena", "memories");
   const hasSerena = existsSync(serenaDir);
@@ -126,8 +151,8 @@ export async function doctor(jsonMode = false): Promise<void> {
 
   const totalIssues =
     missingCLIs.length +
-    mcpChecks.filter((c) => !c.mcp.configured).length +
-    missingSkills.length;
+    missingSkills.length +
+    (globalWorkflows.installed ? 0 : 1);
 
   if (jsonMode) {
     const result = {
@@ -152,6 +177,10 @@ export async function doctor(jsonMode = false): Promise<void> {
             }))
           : [],
       missingSkills: missingSkills.map((s) => s.name),
+      globalWorkflows: {
+        installed: globalWorkflows.installed,
+        count: globalWorkflows.count,
+      },
       serena: { exists: hasSerena, fileCount: serenaFileCount },
     };
     console.log(JSON.stringify(result, null, 2));
@@ -323,6 +352,18 @@ export async function doctor(jsonMode = false): Promise<void> {
       p.note(
         `${pc.yellow("⚠️")} Serena memory directory not found\n${pc.dim("Dashboard will show 'No agents detected'")}`,
         "Serena Memory",
+      );
+    }
+
+    if (globalWorkflows.installed) {
+      p.note(
+        `${pc.green("✅")} Global workflows installed\n${pc.dim(`${globalWorkflows.count} workflow files found`)}`,
+        "Global Workflows",
+      );
+    } else {
+      p.note(
+        `${pc.red("❌")} Global workflows missing\n${pc.dim("Run 'oh-my-ag' to install or reinstall global workflows")}`,
+        "Global Workflows",
       );
     }
 

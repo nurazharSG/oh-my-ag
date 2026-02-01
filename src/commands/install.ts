@@ -8,6 +8,7 @@ import {
   installShared,
   installSkill,
   installWorkflows,
+  installGlobalWorkflows,
   PRESETS,
 } from "../lib/skills.js";
 
@@ -67,6 +68,7 @@ export async function install(): Promise<void> {
     await installShared(cwd);
     await installWorkflows(cwd);
     await installConfigs(cwd);
+    await installGlobalWorkflows();
 
     for (const skillName of selectedSkills) {
       spinner.message(`Installing ${pc.cyan(skillName)}...`);
