@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.5.8](https://github.com/first-fluke/oh-my-ag/compare/oh-my-ag-v1.5.7...oh-my-ag-v1.5.8) (2026-02-02)
+
+
+### Documentation
+
+* remove extra blank line in table of contents ([7ca89a6](https://github.com/first-fluke/oh-my-ag/commit/7ca89a61cd201307a031ac7f9b5f0869855e8b68))
+* update README headlines to include project name ([60192d6](https://github.com/first-fluke/oh-my-ag/commit/60192d63b0472bb8f854fe8ef1b36d519fdf81e3))
+
+
+### Miscellaneous
+
+* update prompt-manifest.json for 1.5.7 ([beed26c](https://github.com/first-fluke/oh-my-ag/commit/beed26c56adcc5f7b4630e8bdd5bd4fa3592c1f1))
+
 ## [1.5.7](https://github.com/first-fluke/oh-my-ag/compare/oh-my-ag-v1.5.6...oh-my-ag-v1.5.7) (2026-02-02)
 
 
