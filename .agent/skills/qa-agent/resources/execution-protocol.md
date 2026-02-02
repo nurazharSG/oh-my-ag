@@ -5,7 +5,7 @@
    - **Simple**: Quick security + quality check | **Medium**: Full 4 steps | **Complex**: Full + prioritized scope
 2. **Check lessons** — read QA section in `../_shared/lessons-learned.md`
 3. **Clarify requirements** — follow `../_shared/clarification-protocol.md`
-   - Check **Uncertainty Triggers**: 보안/인증 관련, 기존 코드 충돌 가능성?
+   - Check **Uncertainty Triggers**: security/auth concerns, existing code conflict potential?
    - Determine level: LOW → proceed | MEDIUM → present options | HIGH → ask immediately
 4. **Budget context** — follow `../_shared/context-budget.md` (prioritize high-risk files)
 5. **After review**: add recurring issues to `../_shared/lessons-learned.md`

@@ -14,7 +14,7 @@ Do NOT stop or ask for help until you have exhausted the playbook.
 3. Check: is the API response type matching the expected shape?
 4. If API mismatch: update the type to match actual response (don't cast with `as any`)
 5. If generic issue: use explicit type parameter `<Type>` instead of inference
-6. **절대 하지 말 것**: `@ts-ignore`, `as any` — 타입 문제를 해결하지 않고 숨기는 것
+6. **NEVER do this**: `@ts-ignore`, `as any` — hides type issues without resolving them
 
 ---
 
@@ -40,7 +40,7 @@ Do NOT stop or ask for help until you have exhausted the playbook.
    - Test expects old behavior → update test
    - Component bug → fix component
 4. Re-run the specific test: `npx vitest run path/to/test.ts`
-5. **3회 실패 시**: 다른 접근 방식 시도. progress에 기록
+5. **After 3 failures**: Try a different approach. Record in progress
 
 ---
 
@@ -86,23 +86,23 @@ Do NOT stop or ask for help until you have exhausted the playbook.
 
 **Symptoms**: `429`, `RESOURCE_EXHAUSTED`, `rate limit exceeded`
 
-1. **즉시 멈춤** — 추가 API 호출 하지 말 것
-2. 현재까지 작업을 `progress-{agent-id}.md`에 저장
-3. `result-{agent-id}.md`에 Status: `quota_exceeded` 기록
-4. 남은 작업 목록을 명시
+1. **Stop immediately** — do not make additional API calls
+2. Save current work to `progress-{agent-id}.md`
+3. Record Status: `quota_exceeded` in `result-{agent-id}.md`
+4. Specify remaining tasks
 
 ---
 
-## Serena Memory 접근 불가
+## Serena Memory Unavailable
 
-1. 1회 재시도
-2. 2회 연속 실패: 로컬 파일 `/tmp/progress-{agent-id}.md` 사용
-3. result에 `memory_fallback: true` 플래그 추가
+1. Retry once
+2. If 2 consecutive failures: use local file `/tmp/progress-{agent-id}.md`
+3. Add `memory_fallback: true` flag to result
 
 ---
 
-## 일반 원칙
+## General Principles
 
-- **3회 실패**: 같은 접근 3번 실패하면 반드시 다른 방법 시도
-- **막힘**: 5턴 이상 진전 없으면 현재 상태 저장하고 `Status: blocked` 기록
-- **범위 초과**: backend 문제 발견 시 result에 기록만, 직접 수정하지 말 것
+- **After 3 failures**: If same approach fails 3 times, must try a different method
+- **Blocked**: If no progress after 5 turns, save current state and record `Status: blocked`
+- **Out of scope**: If you find backend issues, only record in result — do not modify directly

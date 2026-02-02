@@ -5,7 +5,7 @@
    - **Simple**: Skip to Step 3 | **Medium**: All 4 steps | **Complex**: All steps + checkpoints
 2. **Check lessons** — read your domain section in `../_shared/lessons-learned.md`
 3. **Clarify requirements** — follow `../_shared/clarification-protocol.md`
-   - Check **Uncertainty Triggers**: 보안/인증 관련 버그, 기존 코드 충돌 가능성?
+   - Check **Uncertainty Triggers**: security/auth related bugs, existing code conflict potential?
    - Determine level: LOW → proceed | MEDIUM → present options | HIGH → ask immediately
 4. **Use reasoning templates** — for Complex bugs, use `../_shared/reasoning-templates.md` (hypothesis loop, execution trace)
 5. **Budget context** — follow `../_shared/context-budget.md` (use find_symbol, not read_file)

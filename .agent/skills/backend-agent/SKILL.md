@@ -16,7 +16,7 @@ description: Backend specialist for APIs, databases, authentication using FastAP
 - Frontend UI -> use Frontend Agent
 - Mobile-specific code -> use Mobile Agent
 
-## Core Principles
+## Core Rules
 
 1. **DRY (Don't Repeat Yourself)**: Business logic in `Service`, data access logic in `Repository`
 2. **SOLID**:

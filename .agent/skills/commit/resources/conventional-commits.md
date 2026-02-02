@@ -2,10 +2,10 @@
 
 ## Overview
 
-Conventional Commits는 커밋 메시지에 일관된 규칙을 적용하여:
-- 자동화된 CHANGELOG 생성
-- Semantic Versioning 자동화
-- 팀원 간 커밋 히스토리 이해도 향상
+Conventional Commits applies consistent rules to commit messages to enable:
+- Automated CHANGELOG generation
+- Semantic Versioning automation
+- Improved commit history readability across teams
 
 ## Commit Message Structure
 
@@ -23,23 +23,23 @@ Conventional Commits는 커밋 메시지에 일관된 규칙을 적용하여:
 
 | Type | Description | SemVer | Example |
 |------|-------------|--------|---------|
-| `feat` | 새로운 기능 추가 | MINOR | `feat: add user authentication` |
-| `fix` | 버그 수정 | PATCH | `fix: resolve login timeout issue` |
+| `feat` | Add new feature | MINOR | `feat: add user authentication` |
+| `fix` | Bug fix | PATCH | `fix: resolve login timeout issue` |
 
 ### Secondary Types
 
 | Type | Description | SemVer | Example |
 |------|-------------|--------|---------|
-| `docs` | 문서 변경 | - | `docs: update API documentation` |
-| `style` | 코드 스타일 변경 (포맷팅, 세미콜론 등) | - | `style: fix indentation` |
-| `refactor` | 기능 변경 없는 코드 개선 | - | `refactor: extract helper function` |
-| `perf` | 성능 개선 | PATCH | `perf: optimize database queries` |
-| `test` | 테스트 추가/수정 | - | `test: add unit tests for auth` |
-| `chore` | 빌드, 설정, 패키지 관련 | - | `chore: update dependencies` |
+| `docs` | Documentation changes | - | `docs: update API documentation` |
+| `style` | Code style changes (formatting, semicolons, etc.) | - | `style: fix indentation` |
+| `refactor` | Code improvement without behavior change | - | `refactor: extract helper function` |
+| `perf` | Performance improvements | PATCH | `perf: optimize database queries` |
+| `test` | Add/modify tests | - | `test: add unit tests for auth` |
+| `chore` | Build, config, packages | - | `chore: update dependencies` |
 
 ## Scope
 
-Scope는 변경된 코드의 영역을 나타냅니다:
+Scope indicates the area of changed code:
 
 ```
 feat(auth): add OAuth2 support
@@ -48,19 +48,19 @@ refactor(ui): simplify button component
 ```
 
 ### Common Scopes
-- `auth` - 인증/인가
-- `api` - API 엔드포인트
-- `ui` - 사용자 인터페이스
-- `db` - 데이터베이스
-- `config` - 설정
-- `deps` - 의존성
+- `auth` - Authentication/authorization
+- `api` - API endpoints
+- `ui` - User interface
+- `db` - Database
+- `config` - Configuration
+- `deps` - Dependencies
 
 ## Description
 
-- **명령형** 사용: "add", "fix", "update" (NOT "added", "fixed", "updates")
-- **첫 글자 소문자**
-- **마침표 없음**
-- **72자 이내**
+- **Imperative mood**: "add", "fix", "update" (NOT "added", "fixed", "updates")
+- **Lowercase first letter**
+- **No trailing period**
+- **72 characters or less**
 
 ### Good Examples
 ```
@@ -71,14 +71,14 @@ refactor(ui): extract common button styles
 
 ### Bad Examples
 ```
-feat(auth): Added JWT token refresh mechanism.  # 과거형, 마침표
-fix: fix bug  # 설명 부족
-Update the authentication system to support OAuth2 tokens and refresh mechanism  # 너무 김
+feat(auth): Added JWT token refresh mechanism.  # past tense, period
+fix: fix bug  # insufficient description
+Update the authentication system to support OAuth2 tokens and refresh mechanism  # too long
 ```
 
 ## Body
 
-Body는 선택사항이지만, 복잡한 변경사항에 유용합니다:
+Body is optional but useful for complex changes:
 
 ```
 feat(auth): add multi-factor authentication
@@ -93,7 +93,7 @@ Closes #123
 
 ## Breaking Changes
 
-Breaking change는 `!` 또는 footer로 표시:
+Breaking changes marked with `!` or in footer:
 
 ```
 feat(api)!: change response format for user endpoint

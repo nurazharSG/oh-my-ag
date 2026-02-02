@@ -14,7 +14,7 @@ Do NOT stop or ask for help until you have exhausted the playbook.
 3. If `npm audit`: try `npm audit --production` to skip devDependencies
 4. If `bandit`: check Python path — may need `python -m bandit`
 5. If `lighthouse`: requires a running server — note if server not available
-6. **도구 없으면**: 수동 리뷰로 대체, result에 `tool_unavailable: ["tool_name"]` 기록
+6. **If tool unavailable**: Fall back to manual review, record `tool_unavailable: ["tool_name"]` in result
 
 ---
 
@@ -26,7 +26,7 @@ Do NOT stop or ask for help until you have exhausted the playbook.
 2. Check: is there validation/sanitization upstream?
 3. Check: is the framework handling this automatically? (e.g., ORM prevents SQL injection)
 4. If uncertain: mark severity as `MEDIUM` with note "verify manually"
-5. **절대 하지 말 것**: 확신 없이 CRITICAL로 마킹 — 잘못된 경보는 신뢰를 떨어뜨림
+5. **NEVER do this**: Mark as CRITICAL without certainty — false alarms erode trust
 
 ---
 
@@ -73,23 +73,23 @@ Do NOT stop or ask for help until you have exhausted the playbook.
 
 **Symptoms**: `429`, `RESOURCE_EXHAUSTED`, `rate limit exceeded`
 
-1. **즉시 멈춤** — 추가 API 호출 하지 말 것
-2. 현재까지 작업을 `progress-{agent-id}.md`에 저장
-3. `result-{agent-id}.md`에 Status: `quota_exceeded` 기록
-4. 남은 작업 목록을 명시
+1. **Stop immediately** — do not make additional API calls
+2. Save current work to `progress-{agent-id}.md`
+3. Record Status: `quota_exceeded` in `result-{agent-id}.md`
+4. Specify remaining tasks
 
 ---
 
-## Serena Memory 접근 불가
+## Serena Memory Unavailable
 
-1. 1회 재시도
-2. 2회 연속 실패: 로컬 파일 `/tmp/progress-{agent-id}.md` 사용
-3. result에 `memory_fallback: true` 플래그 추가
+1. Retry once
+2. If 2 consecutive failures: use local file `/tmp/progress-{agent-id}.md`
+3. Add `memory_fallback: true` flag to result
 
 ---
 
-## 일반 원칙
+## General Principles
 
-- **오탐 방지**: 확신 없는 finding은 severity 낮추고 "verify manually" 표시
-- **막힘**: 5턴 이상 진전 없으면 현재 상태 저장, `Status: blocked`
-- **수정 금지**: QA는 리포트만 — 코드 수정은 해당 에이전트에게 위임
+- **False positive prevention**: If finding is uncertain, lower severity and mark "verify manually"
+- **Blocked**: If no progress after 5 turns, save current state, `Status: blocked`
+- **No code modification**: QA only reports — delegate code changes to the appropriate agent

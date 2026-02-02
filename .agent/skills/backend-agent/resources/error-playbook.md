@@ -28,7 +28,7 @@ Do NOT stop or ask for help until you have exhausted the playbook.
    - Implementation has a bug → fix implementation
 4. Re-run the specific test: `pytest path/to/test.py::test_name -v`
 5. After fix, run full test suite to check for regressions
-6. **3회 실패 시**: 다른 접근 방식 시도. 현재 시도를 progress에 기록하고 대안 구현
+6. **After 3 failures**: Try a different approach. Record current attempt in progress and implement alternative
 
 ---
 
@@ -40,7 +40,7 @@ Do NOT stop or ask for help until you have exhausted the playbook.
 2. Check current DB state: `alembic current`
 3. If migration conflicts: `alembic downgrade -1` then fix migration script
 4. If schema mismatch: compare model with actual DB schema
-5. **절대 하지 말 것**: `alembic stamp head` (데이터 손실 위험)
+5. **NEVER do this**: `alembic stamp head` (risk of data loss)
 
 ---
 
@@ -72,27 +72,27 @@ Do NOT stop or ask for help until you have exhausted the playbook.
 
 **Symptoms**: `429`, `RESOURCE_EXHAUSTED`, `rate limit exceeded`
 
-1. **즉시 멈춤** — 추가 API 호출 하지 말 것
-2. 현재까지 작업을 `progress-{agent-id}.md`에 저장
-3. `result-{agent-id}.md`에 Status: `quota_exceeded` 기록
-4. 남은 작업 목록을 명시하여 orchestrator가 나중에 재시도할 수 있게 함
+1. **Stop immediately** — do not make additional API calls
+2. Save current work to `progress-{agent-id}.md`
+3. Record Status: `quota_exceeded` in `result-{agent-id}.md`
+4. Specify remaining tasks so orchestrator can retry later
 
 ---
 
-## Serena Memory 접근 불가
+## Serena Memory Unavailable
 
-**Symptoms**: `write_memory` / `read_memory` 실패, timeout
+**Symptoms**: `write_memory` / `read_memory` failure, timeout
 
-1. 1회 재시도 (일시적 오류일 수 있음)
-2. 2회 연속 실패 시: 로컬 파일로 대체
-   - progress → `/tmp/progress-{agent-id}.md`로 작성
-   - result → `/tmp/result-{agent-id}.md`로 작성
-3. result에 `memory_fallback: true` 플래그 추가
+1. Retry once (may be transient error)
+2. If 2 consecutive failures: fall back to local files
+   - progress → write to `/tmp/progress-{agent-id}.md`
+   - result → write to `/tmp/result-{agent-id}.md`
+3. Add `memory_fallback: true` flag to result
 
 ---
 
-## 일반 원칙
+## General Principles
 
-- **3회 실패**: 같은 접근 3번 실패하면 반드시 다른 방법 시도
-- **막힘**: 5턴 이상 진전 없으면 현재 상태 저장하고 result에 `Status: blocked` 기록
-- **범위 초과**: 다른 에이전트 영역의 문제 발견 시, result에 기록만 하고 직접 수정하지 말 것
+- **After 3 failures**: If same approach fails 3 times, must try a different method
+- **Blocked**: If no progress after 5 turns, save current state and record `Status: blocked` in result
+- **Out of scope**: If you find issues in another agent's domain, only record in result — do not modify directly

@@ -9,7 +9,7 @@ description: Automated multi-agent orchestrator that spawns CLI subagents in par
 - Complex feature requires multiple specialized agents working in parallel
 - User wants automated execution without manually spawning agents
 - Full-stack implementation spanning backend, frontend, mobile, and QA
-- User says "자동으로 실행해줘", "병렬로 돌려줘", or similar automation requests
+- User says "run it automatically", "run in parallel", or similar automation requests
 
 ## When NOT to use
 - Simple single-domain task -> use the specific agent directly
@@ -81,6 +81,10 @@ bash .agent/skills/_shared/verify.sh {agent-type} {workspace}
 - 1st retry: Wait 30s, re-spawn with error context (include verify.sh output)
 - 2nd retry: Wait 60s, add "Try a different approach"
 - Final failure: Report to user, ask whether to continue or abort
+
+## Serena Memory (CLI Mode)
+
+See `../_shared/memory-protocol.md`.
 
 ## References
 - Prompt template: `resources/subagent-prompt-template.md`

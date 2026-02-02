@@ -34,6 +34,10 @@ Save plan to `.agent/plan.json` and `.gemini/antigravity/brain/current-plan.md`.
 - Tight Coupling: tasks should use public APIs, not internal state
 - Deferred Quality: testing is part of every task, not a final phase
 
+## Serena Memory (CLI Mode)
+
+See `../_shared/memory-protocol.md`.
+
 ## References
 - Execution steps: `resources/execution-protocol.md`
 - Plan examples: `resources/examples.md`

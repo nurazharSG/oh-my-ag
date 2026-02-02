@@ -6,13 +6,13 @@ When you encounter a failure during planning, follow these recovery steps.
 
 ## Requirements Ambiguous
 
-**Symptoms**: User request is vague ("좋은 앱 만들어줘", "Make it better")
+**Symptoms**: User request is vague ("Make me a good app", "Make it better")
 
 1. Break down what you DO understand
 2. List specific assumptions you're making
 3. Create plan based on reasonable assumptions
 4. Mark assumptions clearly: `⚠️ Assumption: [description]`
-5. **절대 하지 말 것**: 모호한 채로 태스크를 생성 — 에이전트가 방향을 잃음
+5. **NEVER do this**: Create tasks while still ambiguous — agents will lose direction
 
 ---
 
@@ -64,12 +64,12 @@ When you encounter a failure during planning, follow these recovery steps.
 
 ## Serena Memory / Quota Issues
 
-동일: backend-agent 플레이북의 해당 섹션 참조.
+Same as backend-agent playbook: See relevant sections.
 
 ---
 
-## 일반 원칙
+## General Principles
 
-- **계획은 코드가 아님**: 완벽하지 않아도 됨. 에이전트가 실행 중 조정할 수 있음
-- **막힘**: 5턴 이상 진전 없으면 현재 상태 저장, `Status: blocked`
-- **코드 작성 금지**: PM은 계획만 — 구현은 다른 에이전트에게 위임
+- **Plans are not code**: They don't need to be perfect. Agents can adjust during execution
+- **Blocked**: If no progress after 5 turns, save current state, `Status: blocked`
+- **No code writing**: PM only plans — delegate implementation to other agents

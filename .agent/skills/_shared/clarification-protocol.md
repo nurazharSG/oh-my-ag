@@ -1,44 +1,44 @@
 # Clarification Protocol
 
-요구사항이 모호할 때 "가정하고 진행"하면 대부분 잘못된 방향으로 간다.
-이 프로토콜을 따라 명확한 요구사항을 확보한 후 실행한다.
+When requirements are ambiguous, "assuming and proceeding" usually leads in the wrong direction.
+Follow this protocol to secure clear requirements before execution.
 
-> **핵심 원칙**: "Agents learn when to ask for help rather than blindly attempting every task" - Ask early, ask often.
-
----
-
-## 불확실성 레벨 정의 (Uncertainty Levels)
-
-| 레벨 | 상태 | 행동 | 예시 |
-|------|------|------|------|
-| **LOW** | 명확함 | 기본값 적용 후 진행, 가정 기록 | "TODO 앱 만들어줘" |
-| **MEDIUM** | 일부 모호 | 2-3개 옵션 제시 + 사용자 선택 요청 | "사용자 관리 시스템 만들어줘" |
-| **HIGH** | 매우 모호 | **진행 불가**, 반드시 질문 | "좋은 앱 만들어줘" |
+> **Core Principle**: "Agents learn when to ask for help rather than blindly attempting every task" - Ask early, ask often.
 
 ---
 
-## 불확실성 트리거 (Uncertainty Triggers)
+## Uncertainty Level Definitions
 
-다음 상황에서 자동으로 MEDIUM/HIGH 레벨로 분류:
-
-### HIGH (반드시 질문)
-- [ ] 비즈니스 로직 결정 필요 (가격 정책, 승인 워크플로우 등)
-- [ ] 보안/인증 관련 결정 (OAuth provider, 권한 모델 등)
-- [ ] 기존 코드와 충돌 가능성 있음
-- [ ] 요구사항이主관적 ("좋은", "빠른", "예쁜")
-- [ ] 범위가 무제한으로 느껴짐
-
-### MEDIUM (옵션 제시)
-- [ ] 기술 스택 선택 가능성 2개 이상
-- [ ] 구현 방식에 대한 trade-off 존재
-- [ ] 우선순위가 불명확한 다중 기능
-- [ ] 외부 API/서비스 선택 필요
+| Level | State | Action | Example |
+|-------|-------|--------|---------|
+| **LOW** | Clear | Apply defaults and proceed, record assumptions | "Create a TODO app" |
+| **MEDIUM** | Partially ambiguous | Present 2-3 options + request user selection | "Create a user management system" |
+| **HIGH** | Very ambiguous | **Cannot proceed**, must ask questions | "Create a good app" |
 
 ---
 
-## 에스컬레이션 템플릿 (Escalation Templates)
+## Uncertainty Triggers
 
-### LOW → 진행 (Assumed)
+Automatically classify as MEDIUM/HIGH level in the following situations:
+
+### HIGH (Must Ask)
+- [ ] Business logic decisions needed (pricing policy, approval workflow, etc.)
+- [ ] Security/authentication decisions (OAuth provider, permission model, etc.)
+- [ ] Possible conflict with existing code
+- [ ] Requirements are subjective ("good", "fast", "pretty")
+- [ ] Scope feels unlimited
+
+### MEDIUM (Present Options)
+- [ ] 2+ technology stack choices possible
+- [ ] Trade-offs exist for implementation approach
+- [ ] Multiple features with unclear priority
+- [ ] External API/service selection needed
+
+---
+
+## Escalation Templates
+
+### LOW → Proceed (Assumed)
 ```
 ⚠️ Assumptions applied:
 - JWT authentication included
@@ -49,7 +49,7 @@
 Proceeding with these defaults. Override if needed.
 ```
 
-### MEDIUM → 선택 요청 (Options)
+### MEDIUM → Request Selection (Options)
 ```
 🔍 Uncertainty detected: {specific issue}
 
@@ -71,7 +71,7 @@ Option C: {approach}
 Which approach do you prefer? (A/B/C)
 ```
 
-### HIGH → 차단 (Blocked)
+### HIGH → Blocked
 ```
 ❌ Cannot proceed: Requirements too ambiguous
 
@@ -89,54 +89,54 @@ Status: BLOCKED (awaiting clarification)
 
 ---
 
-## 필수 확인 항목
+## Required Verification Items
 
-아래 항목 중 하나라도 불명확하면 **가정하지 말고** 명시적으로 기록한다.
+If any of the items below are unclear, **do not assume** — explicitly record them.
 
-### 모든 에이전트 공통
-| 항목 | 확인 질문 | 기본값 (가정 시) | 불확실성 |
-|------|----------|-----------------|----------|
-| 대상 사용자 | 누가 쓰는 서비스인가? | 일반 웹 사용자 | LOW |
-| 핵심 기능 | 반드시 포함해야 할 기능 3가지는? | 태스크 설명에서 추론 | MEDIUM |
-| 기술 스택 | 특정 프레임워크 제약이 있는가? | 프로젝트 기본 스택 | LOW |
-| 인증 | 로그인이 필요한가? | JWT 인증 포함 | MEDIUM |
-| 범위 | MVP인가 완전한 기능인가? | MVP | LOW |
+### Common to All Agents
+| Item | Verification Question | Default (if assumed) | Uncertainty |
+|------|----------------------|---------------------|-------------|
+| Target users | Who will use this service? | General web users | LOW |
+| Core features | What are the 3 must-have features? | Infer from task description | MEDIUM |
+| Tech stack | Are there specific framework constraints? | Project default stack | LOW |
+| Authentication | Is login required? | JWT authentication included | MEDIUM |
+| Scope | MVP or full-featured? | MVP | LOW |
 
-### Backend Agent 추가 확인
-| 항목 | 확인 질문 | 기본값 | 불확실성 |
-|------|----------|--------|----------|
-| DB 선택 | PostgreSQL? MongoDB? SQLite? | PostgreSQL | MEDIUM |
-| API 스타일 | REST? GraphQL? gRPC? | REST | MEDIUM |
-| 인증 방식 | JWT? Session? OAuth? | JWT (access + refresh) | HIGH |
-| 파일 업로드 | 필요한가? 크기 제한은? | 불필요 | LOW |
-| 배포 환경 | Serverless? Container? VM? | Container | MEDIUM |
+### Backend Agent Additional Verification
+| Item | Verification Question | Default | Uncertainty |
+|------|----------------------|---------|-------------|
+| DB selection | PostgreSQL? MongoDB? SQLite? | PostgreSQL | MEDIUM |
+| API style | REST? GraphQL? gRPC? | REST | MEDIUM |
+| Auth method | JWT? Session? OAuth? | JWT (access + refresh) | HIGH |
+| File upload | Needed? Size limit? | Not needed | LOW |
+| Deployment environment | Serverless? Container? VM? | Container | MEDIUM |
 
-### Frontend Agent 추가 확인
-| 항목 | 확인 질문 | 기본값 | 불확실성 |
-|------|----------|--------|----------|
-| SSR/CSR | Server-side rendering 필요? | Next.js App Router (SSR) | MEDIUM |
-| 다크모드 | 지원 필요? | 지원 | LOW |
-| 국제화 | 다국어 지원? | 불필요 | LOW |
-| 기존 디자인 시스템 | 사용할 UI 라이브러리? | shadcn/ui | MEDIUM |
-| 상태 관리 | Context? Redux? Zustand? | Zustand | MEDIUM |
+### Frontend Agent Additional Verification
+| Item | Verification Question | Default | Uncertainty |
+|------|----------------------|---------|-------------|
+| SSR/CSR | Server-side rendering needed? | Next.js App Router (SSR) | MEDIUM |
+| Dark mode | Support needed? | Supported | LOW |
+| Internationalization | Multi-language support? | Not needed | LOW |
+| Existing design system | UI library to use? | shadcn/ui | MEDIUM |
+| State management | Context? Redux? Zustand? | Zustand | MEDIUM |
 
-### Mobile Agent 추가 확인
-| 항목 | 확인 질문 | 기본값 | 불확실성 |
-|------|----------|--------|----------|
-| 플랫폼 | iOS만? Android만? 둘 다? | 둘 다 | MEDIUM |
-| 오프라인 | 오프라인 지원 필요? | 불필요 | LOW |
-| 푸시 알림 | 필요한가? | 불필요 | LOW |
-| 최소 OS | iOS/Android 최소 버전? | iOS 14+, Android API 24+ | LOW |
-| 아키텍처 | MVC? MVVM? Clean? | MVVM | MEDIUM |
+### Mobile Agent Additional Verification
+| Item | Verification Question | Default | Uncertainty |
+|------|----------------------|---------|-------------|
+| Platform | iOS only? Android only? Both? | Both | MEDIUM |
+| Offline | Offline support needed? | Not needed | LOW |
+| Push notifications | Needed? | Not needed | LOW |
+| Minimum OS | iOS/Android minimum versions? | iOS 14+, Android API 24+ | LOW |
+| Architecture | MVC? MVVM? Clean? | MVVM | MEDIUM |
 
 ---
 
-## 모호함 수준별 대응 (상세)
+## Detailed Response by Ambiguity Level
 
-### Level 1 (LOW): 약간 모호 (핵심은 명확, 세부사항 부족)
-예: "TODO 앱 만들어줘"
+### Level 1 (LOW): Slightly ambiguous (core is clear, details lacking)
+Example: "Create a TODO app"
 
-**대응**: 기본값을 적용하고, 가정 목록을 result에 기록
+**Response**: Apply defaults and record assumption list in result
 ```
 ⚠️ Assumptions:
 - JWT authentication included
@@ -145,10 +145,10 @@ Status: BLOCKED (awaiting clarification)
 - MVP scope (CRUD only)
 ```
 
-### Level 2 (MEDIUM): 상당히 모호 (핵심 기능이 불명확)
-예: "사용자 관리 시스템 만들어줘"
+### Level 2 (MEDIUM): Considerably ambiguous (core features unclear)
+Example: "Create a user management system"
 
-**대응**: 핵심 기능을 3가지로 좁혀서 명시하고 진행
+**Response**: Narrow scope to 3 core features, specify and proceed
 ```
 ⚠️ Interpreted scope (3 core features):
 1. User registration + login (JWT)
@@ -161,10 +161,10 @@ NOT included (would need separate task):
 - Email verification
 ```
 
-### Level 3 (HIGH): 매우 모호 (방향 자체가 불명확)
-예: "좋은 앱 만들어줘", "이거 개선해줘"
+### Level 3 (HIGH): Very ambiguous (direction itself unclear)
+Example: "Create a good app", "Improve this"
 
-**대응**: 진행하지 말고 구체화 요청을 result에 기록
+**Response**: Do not proceed, record clarification request in result
 ```
 ❌ Cannot proceed: Requirements too ambiguous
 
@@ -179,39 +179,39 @@ Status: blocked (awaiting clarification)
 
 ---
 
-## PM Agent 전용: 요구사항 구체화 프레임워크
+## PM Agent Only: Requirements Specification Framework
 
-PM Agent는 모호한 요청을 받으면 아래 프레임워크로 구체화한다:
+PM Agent uses the framework below to specify ambiguous requests:
 
 ```
-=== 요구사항 구체화 ===
+=== Requirements Specification ===
 
-원본 요청: "{사용자 원문}"
+Original request: "{user's original text}"
 
-1. 핵심 목표: {한 문장으로 정의}
-2. 사용자 스토리:
+1. Core goal: {define in one sentence}
+2. User stories:
    - "As a {user}, I want to {action} so that {benefit}"
-   - (최소 3개)
-3. 기능 범위:
-   - Must-have: {목록}
-   - Nice-to-have: {목록}
-   - Out-of-scope: {목록}
-4. 기술 제약:
-   - {기존 코드 / 스택 / 호환성}
-5. 성공 기준:
-   - {측정 가능한 조건}
+   - (minimum 3)
+3. Feature scope:
+   - Must-have: {list}
+   - Nice-to-have: {list}
+   - Out-of-scope: {list}
+4. Technical constraints:
+   - {existing code / stack / compatibility}
+5. Success criteria:
+   - {measurable conditions}
 ```
 
 ---
 
-## 서브에이전트 모드에서의 적용
+## Application in Subagent Mode
 
-CLI 서브에이전트는 사용자에게 직접 질문할 수 없다.
-따라서:
+CLI subagents cannot ask users directly.
+Therefore:
 
-1. **Level 1**: 기본값 적용 + 가정 기록 → 진행
-2. **Level 2**: 범위를 좁혀서 해석 + 명시 → 진행
-3. **Level 3**: `Status: blocked` + 질문 목록 → 진행하지 않음
+1. **Level 1**: Apply defaults + record assumptions → Proceed
+2. **Level 2**: Narrow and interpret scope + specify → Proceed
+3. **Level 3**: `Status: blocked` + question list → Do not proceed
 
-Orchestrator는 Level 3 결과를 받으면 사용자에게 질문을 전달하고,
-답변을 받은 후 해당 에이전트를 재실행한다.
+When Orchestrator receives Level 3 result, it relays questions to user
+and re-runs that agent after receiving answers.

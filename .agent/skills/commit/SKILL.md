@@ -6,7 +6,7 @@ description: Create git commits following Conventional Commits specification wit
 # Commit Skill - Conventional Commits
 
 ## When to use
-- When user requests "커밋해줘", "commit", "변경사항 저장"
+- When user requests "commit this", "commit", "save changes"
 - When `/commit` command is invoked
 
 ## Configuration

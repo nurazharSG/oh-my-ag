@@ -1,9 +1,9 @@
 # Commit Configuration
 
-# Conventional Commits 활성화
+# Enable Conventional Commits
 conventional_commits: true
 
-# 허용되는 커밋 타입
+# Allowed commit types
 types:
   - feat
   - fix
@@ -14,7 +14,7 @@ types:
   - style
   - perf
 
-# 브랜치 접두사 규칙
+# Branch prefix rules
 branch_prefixes:
   feat: "feature/"
   fix: "fix/"
@@ -26,25 +26,25 @@ branch_prefixes:
   style: "style/"
   perf: "perf/"
 
-# 커밋 메시지 규칙
+# Commit message rules
 message:
   max_subject_length: 72
   require_body: false
   body_wrap_length: 100
 
-# Scope 규칙
+# Scope rules
 scope:
   required: false
-  # 허용되는 scope 목록 (비어있으면 모두 허용)
+  # Allowed scopes list (empty means all allowed)
   allowed: []
 
-# Co-Author 설정
+# Co-Author settings
 co_author:
   enabled: true
   name: "Claude Opus 4.5"
   email: "noreply@anthropic.com"
 
-# 금지된 파일 패턴 (커밋 경고)
+# Forbidden file patterns (commit warnings)
 forbidden_patterns:
   - "*.env"
   - "*.env.*"

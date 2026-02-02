@@ -13,7 +13,7 @@ Do NOT stop or ask for help until you have exhausted the playbook.
 2. Null safety issue: add `?` for nullable, `!` only if you're certain it's non-null
 3. Type mismatch: check the model class — does it match the API response?
 4. Missing override: add `@override` annotation
-5. **절대 하지 말 것**: `// ignore:` comments로 분석 경고 무시
+5. **NEVER do this**: `// ignore:` comments to suppress analysis warnings
 
 ---
 
@@ -28,7 +28,7 @@ Do NOT stop or ask for help until you have exhausted the playbook.
    - `Pod install` failure: note in result — may need `pod repo update`
    - Minimum deployment target: check `ios/Podfile`
 3. Clean and retry: `flutter clean && flutter pub get`
-4. If persists: note in result with full error — 환경 문제일 수 있음
+4. If persists: note in result with full error — may be environment issue
 
 ---
 
@@ -41,7 +41,7 @@ Do NOT stop or ask for help until you have exhausted the playbook.
 3. Provider not found: wrap test widget with `ProviderScope` (Riverpod)
 4. Mock missing: ensure all dependencies are mocked
 5. Re-run specific test: `flutter test test/path/to_test.dart`
-6. **3회 실패 시**: 다른 접근 방식 시도
+6. **After 3 failures**: Try a different approach
 
 ---
 
@@ -95,12 +95,12 @@ Do NOT stop or ask for help until you have exhausted the playbook.
 
 ## Rate Limit / Quota / Memory Fallback
 
-동일: backend-agent 플레이북의 "Rate Limit" 및 "Serena Memory" 섹션 참조.
+Same as backend-agent playbook: See "Rate Limit" and "Serena Memory" sections.
 
 ---
 
-## 일반 원칙
+## General Principles
 
-- **3회 실패**: 같은 접근 3번 실패하면 반드시 다른 방법 시도
-- **막힘**: 5턴 이상 진전 없으면 현재 상태 저장, `Status: blocked`
-- **범위 초과**: backend/frontend 문제는 result에 기록만
+- **After 3 failures**: If same approach fails 3 times, must try a different method
+- **Blocked**: If no progress after 5 turns, save current state, `Status: blocked`
+- **Out of scope**: Backend/frontend issues — only record in result

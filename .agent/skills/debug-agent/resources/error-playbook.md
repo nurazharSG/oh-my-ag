@@ -13,8 +13,8 @@ Do NOT stop or ask for help until you have exhausted the playbook.
 2. Check environment differences: browser, OS, node/python version
 3. Check data-dependent: does it need specific DB state or test data?
 4. Check timing: is it a race condition? Try adding delays or rapid repetition
-5. **3회 시도 후**: result에 `Status: cannot_reproduce` 기록, 조건 목록 명시
-   - 절대 "재현 불가"라고 바로 포기하지 말 것
+5. **After 3 attempts**: Record `Status: cannot_reproduce` in result with condition list
+   - NEVER give up immediately saying "cannot reproduce"
 
 ---
 
@@ -39,7 +39,7 @@ Do NOT stop or ask for help until you have exhausted the playbook.
 3. `search_for_pattern("suspicious_pattern")` to find related code
 4. Check git history: `git log --oneline -20 -- path/to/file` — when was it last changed?
 5. Check: is it a dependency issue? Library version mismatch?
-6. **5턴 진전 없음**: 현재 분석 결과를 progress에 기록, 다른 가설로 전환
+6. **No progress after 5 turns**: Record current analysis in progress, switch to different hypothesis
 
 ---
 
@@ -53,7 +53,7 @@ Do NOT stop or ask for help until you have exhausted the playbook.
    - What the correct behavior should be
    - Evidence (request/response logs, stack trace)
 3. Record in result: `cross_domain_issue: {agent: "backend", description: "..."}`
-4. **직접 수정하지 말 것** — 다른 에이전트의 코드를 건드리면 충돌 발생
+4. **Do NOT modify directly** — touching another agent's code causes conflicts
 
 ---
 
@@ -83,12 +83,12 @@ Do NOT stop or ask for help until you have exhausted the playbook.
 
 ## Rate Limit / Quota / Memory Fallback
 
-동일: backend-agent 플레이북의 해당 섹션 참조.
+Same as backend-agent playbook: See relevant sections.
 
 ---
 
-## 일반 원칙
+## General Principles
 
-- **3회 실패**: 같은 접근 3번 실패하면 반드시 다른 방법 시도
-- **막힘**: 5턴 이상 진전 없으면 현재 상태 저장, `Status: blocked`
-- **범위 초과**: 다른 에이전트 영역은 기록만, 직접 수정 금지
+- **After 3 failures**: If same approach fails 3 times, must try a different method
+- **Blocked**: If no progress after 5 turns, save current state, `Status: blocked`
+- **Out of scope**: Other agent's domain — only record, do not modify directly

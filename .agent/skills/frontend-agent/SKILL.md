@@ -16,7 +16,7 @@ description: Frontend specialist for React, Next.js, TypeScript with FSD-lite ar
 - Backend API implementation -> use Backend Agent
 - Native mobile development -> use Mobile Agent
 
-## Core Principles
+## Core Rules
 
 1. **Component Reuse**: Use `shadcn/ui` components first. Extend via `cva` variants or composition. Avoid custom CSS.
 2. **Design Fidelity**: Code must map 1:1 to Design Tokens. Resolve discrepancies before implementation.

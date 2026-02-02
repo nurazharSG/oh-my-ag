@@ -1,36 +1,36 @@
 # API Contracts
 
-이 디렉토리는 PM Agent가 생성하고, backend/frontend/mobile 에이전트가 참조하는 API 계약서를 담습니다.
+This directory contains API contracts created by PM Agent and referenced by backend/frontend/mobile agents.
 
-## 사용법
+## Usage
 
-### PM Agent (작성자)
-계획 단계에서 API 계약서를 여기에 생성:
+### PM Agent (Author)
+Create API contracts here during the planning phase:
 ```
 [WRITE]("api-contracts/{domain}.md", contract content)
 ```
 
-MCP 메모리 도구가 없을 경우 이 디렉토리에 직접 파일 생성.
+If MCP memory tool is unavailable, create files directly in this directory.
 
-### Backend Agent (구현자)
-계약서를 읽고 그대로 구현:
+### Backend Agent (Implementer)
+Read contract and implement exactly as specified:
 ```
 [READ]("api-contracts/{domain}.md")
 ```
 
-### Frontend / Mobile Agent (소비자)
-계약서를 읽고 API 클라이언트를 그대로 연동:
+### Frontend / Mobile Agent (Consumer)
+Read contract and integrate API client exactly as specified:
 ```
 [READ]("api-contracts/{domain}.md")
 ```
 
 ## Tool Reference
 
-도구명은 `mcp.json → memoryConfig.tools`에서 설정:
+Tool names are configured in `mcp.json → memoryConfig.tools`:
 - `[READ]` → default: `read_memory`
 - `[WRITE]` → default: `write_memory`
 
-## 계약서 형식
+## Contract Format
 
 ```markdown
 # {Domain} API Contract
@@ -49,8 +49,25 @@ MCP 메모리 도구가 없을 경우 이 디렉토리에 직접 파일 생성.
 - **Response 422**: `{ "detail": [{ "field": "error message" }] }`
 ```
 
-## 규칙
-1. PM Agent가 계획 시 반드시 생성
-2. Backend Agent는 계약서와 다르게 구현하면 안 됨
-3. Frontend/Mobile Agent는 계약서 기준으로 타입 정의
-4. 변경이 필요하면 PM Agent에게 재계획 요청
+## When to Create
+
+- **New API endpoint**: PM Agent creates contract before implementation tasks are assigned
+- **Existing API schema change**: Update contract first, then notify affected agents
+- **Cross-platform feature**: Contract must exist before backend/frontend/mobile tasks start
+
+## Completion Criteria
+
+- [ ] Request schema defined with all required/optional fields
+- [ ] Response schema defined (200, 201, etc.)
+- [ ] Error cases documented (400, 401, 403, 404, 422, 500)
+- [ ] Authentication requirements specified
+- [ ] Rate limiting noted (if applicable)
+- [ ] Backend Agent has reviewed and approved
+- [ ] Frontend/Mobile Agent has reviewed and approved
+
+## Rules
+
+1. PM Agent must create during planning
+2. Backend Agent must not implement differently from contract
+3. Frontend/Mobile Agent defines types based on contract
+4. If changes are needed, request re-planning from PM Agent

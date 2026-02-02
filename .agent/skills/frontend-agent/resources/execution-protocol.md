@@ -5,7 +5,7 @@
    - **Simple**: Skip to Step 3 | **Medium**: All 4 steps | **Complex**: All steps + checkpoints
 2. **Check lessons** — read your domain section in `../_shared/lessons-learned.md`
 3. **Clarify requirements** — follow `../_shared/clarification-protocol.md`
-   - Check **Uncertainty Triggers**: 비즈니스 로직, 보안/인증, 기존 코드 충돌?
+   - Check **Uncertainty Triggers**: business logic, security/auth, existing code conflicts?
    - Determine level: LOW → proceed | MEDIUM → present options | HIGH → ask immediately
 4. **Budget context** — follow `../_shared/context-budget.md` (read symbols, not whole files)
 

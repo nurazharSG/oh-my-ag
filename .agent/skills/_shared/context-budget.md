@@ -1,118 +1,118 @@
 # Context Budget Management
 
-컨텍스트 윈도우는 유한하다. 특히 Flash급 모델에서는 불필요한 로딩이 성능을 직접 저하시킨다.
-이 가이드를 따라 컨텍스트를 효율적으로 사용한다.
+The context window is finite. Especially with Flash-tier models, unnecessary loading directly degrades performance.
+Follow this guide to use context efficiently.
 
 ---
 
-## 핵심 원칙
+## Core Principles
 
-1. **전체 파일 읽기 금지** — 필요한 함수/클래스만 읽는다
-2. **중복 읽기 금지** — 이미 읽은 파일은 다시 읽지 않는다
-3. **리소스 지연 로딩** — 필요한 시점에 필요한 리소스만 로딩한다
-4. **기록 유지** — 읽은 파일과 심볼을 progress에 메모한다
-
----
-
-## 파일 읽기 전략
-
-### Serena MCP 사용 시 (권장)
-
-```
-❌ 나쁜 예: read_file("app/api/todos.py")          ← 전체 파일 500줄
-✅ 좋은 예: find_symbol("create_todo")              ← 해당 함수 30줄
-✅ 좋은 예: get_symbols_overview("app/api")          ← 함수 목록만
-✅ 좋은 예: find_referencing_symbols("TodoService")  ← 사용처만
-```
-
-### Serena 없이 파일 읽기 시
-
-```
-❌ 나쁜 예: 파일 전체를 한 번에 읽기
-✅ 좋은 예: 파일의 첫 50줄 (import + 클래스 정의) 확인 → 필요한 함수만 추가 읽기
-```
+1. **No full file reads** — Read only necessary functions/classes
+2. **No duplicate reads** — Do not re-read files already read
+3. **Lazy resource loading** — Load resources only when needed
+4. **Maintain records** — Note read files and symbols in progress
 
 ---
 
-## 리소스 로딩 예산
+## File Reading Strategy
 
-### Flash급 모델 (128K 컨텍스트)
+### When Using Serena MCP (Recommended)
 
-| 구분 | 예산 | 비고 |
-|------|------|------|
-| SKILL.md | ~800 토큰 | 자동 로딩 |
-| execution-protocol.md | ~500 토큰 | 항상 로딩 |
-| 태스크 리소스 1개 | ~500 토큰 | 난이도별 선택 |
-| 태스크 리소스 2개 | ~500 토큰 | Complex만 |
-| error-playbook.md | ~800 토큰 | 에러 시만 |
-| **총 리소스 예산** | **~3,100 토큰** | 전체의 ~2.4% |
-| **작업용 예산** | **~125K 토큰** | 나머지 전부 |
+```
+❌ Bad: read_file("app/api/todos.py")          ← entire file 500 lines
+✅ Good: find_symbol("create_todo")             ← just that function 30 lines
+✅ Good: get_symbols_overview("app/api")        ← function list only
+✅ Good: find_referencing_symbols("TodoService") ← usage only
+```
 
-### Pro급 모델 (1M+ 컨텍스트)
+### When Reading Files Without Serena
 
-| 구분 | 예산 | 비고 |
-|------|------|------|
-| 리소스 예산 | ~5,000 토큰 | 넉넉하게 로딩 가능 |
-| 작업용 예산 | ~1M 토큰 | 큰 파일도 가능 |
-
-Pro는 예산 압박이 적지만, 불필요한 로딩은 여전히 주의력을 분산시킨다.
+```
+❌ Bad: Read entire file at once
+✅ Good: Check first 50 lines (imports + class definitions) → read additional functions as needed
+```
 
 ---
 
-## 읽은 파일 추적 (progress에 기록)
+## Resource Loading Budget
 
-에이전트는 progress 업데이트 시 읽은 파일/심볼을 기록한다:
+### Flash-tier Models (128K context)
+
+| Category | Budget | Notes |
+|----------|--------|-------|
+| SKILL.md | ~800 tokens | Auto-loaded |
+| execution-protocol.md | ~500 tokens | Always loaded |
+| Task resource 1 | ~500 tokens | Selected by difficulty |
+| Task resource 2 | ~500 tokens | Complex only |
+| error-playbook.md | ~800 tokens | On error only |
+| **Total resource budget** | **~3,100 tokens** | ~2.4% of total |
+| **Working budget** | **~125K tokens** | Everything else |
+
+### Pro-tier Models (1M+ context)
+
+| Category | Budget | Notes |
+|----------|--------|-------|
+| Resource budget | ~5,000 tokens | Can load generously |
+| Working budget | ~1M tokens | Large files possible |
+
+Pro has less budget pressure, but unnecessary loading still diverts attention.
+
+---
+
+## Tracking Read Files (Record in Progress)
+
+Agents record read files/symbols when updating progress:
 
 ```markdown
 ## Turn 3 Progress
 
-### 읽은 파일
+### Read Files
 - app/api/todos.py: create_todo(), update_todo() (find_symbol)
 - app/models/todo.py: Todo class (find_symbol)
-- app/schemas/todo.py: 전체 (짧은 파일, 40줄)
+- app/schemas/todo.py: entire file (short file, 40 lines)
 
-### 아직 안 읽은 파일
-- app/services/todo_service.py (다음 턴에 읽을 예정)
-- tests/test_todos.py (구현 후 참조)
+### Not Yet Read
+- app/services/todo_service.py (will read next turn)
+- tests/test_todos.py (reference after implementation)
 
-### 수행한 작업
-- TodoCreate 스키마에 priority 필드 추가
+### Work Completed
+- Added priority field to TodoCreate schema
 ```
 
-이렇게 하면:
-- 같은 파일을 중복으로 읽지 않음
-- 다음 턴에 뭘 할지 명확함
-- Orchestrator가 에이전트 상태를 파악 가능
+This approach:
+- Prevents reading the same file twice
+- Clarifies what to do next turn
+- Allows Orchestrator to understand agent state
 
 ---
 
-## 대형 파일 처리 전략
+## Large File Handling Strategy
 
-### 500줄 이상 파일
+### Files Over 500 Lines
 
-1. `get_symbols_overview`로 구조 파악
-2. 필요한 심볼만 `find_symbol`로 읽기
-3. 전체 파일은 절대 읽지 않음
+1. Use `get_symbols_overview` to understand structure
+2. Read only necessary symbols with `find_symbol`
+3. Never read the entire file
 
-### 복잡한 컴포넌트 (React/Flutter)
+### Complex Components (React/Flutter)
 
-1. 컴포넌트의 props/state 정의만 먼저 읽기
-2. render/build 메서드는 수정이 필요할 때만 읽기
-3. 스타일 부분은 수정 대상이 아니면 스킵
+1. Read only props/state definitions first
+2. Read render/build methods only when modification needed
+3. Skip style sections unless they are modification targets
 
-### 테스트 파일
+### Test Files
 
-1. 구현 완료 후에만 읽기 (구현 전에는 불필요)
-2. 기존 테스트 패턴만 확인 (첫 1-2개 테스트 함수만)
-3. 나머지는 패턴을 따라서 작성
+1. Read only after implementation is complete (unnecessary before)
+2. Check only existing test patterns (first 1-2 test functions)
+3. Write remaining tests following the pattern
 
 ---
 
-## 컨텍스트 초과 징후 & 대응
+## Context Overflow Symptoms & Responses
 
-| 징후 | 의미 | 대응 |
-|------|------|------|
-| 앞서 읽은 코드를 잊음 | 컨텍스트 윈도우 소진 | progress에 핵심 정보 메모, 재참조 가능하게 |
-| 같은 파일을 반복 읽음 | 추적 미비 | progress의 "읽은 파일" 목록 확인 |
-| 출력이 갑자기 짧아짐 | 출력 토큰 부족 | 핵심만 작성, 부가 설명 생략 |
-| 지시사항을 무시함 | SKILL.md 내용 잊음 | execution-protocol 핵심만 재참조 |
+| Symptom | Meaning | Response |
+|---------|---------|----------|
+| Forgetting previously read code | Context window exhausted | Note key info in progress, make re-referenceable |
+| Re-reading the same file | Tracking gap | Check "Read Files" list in progress |
+| Output suddenly becomes shorter | Output tokens insufficient | Write only essentials, omit extra explanations |
+| Ignoring instructions | Forgot SKILL.md content | Re-reference only execution-protocol essentials |

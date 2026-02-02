@@ -2,7 +2,7 @@
 
 ## Example 1: Full-Stack TODO App
 
-**Input**: "JWT 인증이 있는 TODO 앱을 만들어줘"
+**Input**: "Build a TODO app with JWT authentication"
 
 **Workflow**:
 
@@ -33,7 +33,7 @@ Step 6: Address QA findings
 
 ## Example 2: Adding Feature to Existing App
 
-**Input**: "블로그에 댓글 기능을 추가해줘"
+**Input**: "Add a comment feature to the blog"
 
 **Workflow**:
 
@@ -54,7 +54,7 @@ Step 4: QA review
 
 ## Example 3: When to Use Orchestrator Instead
 
-**User**: "자동으로 실행해줘" / "Run everything automatically"
+**User**: "Run everything automatically"
 
 **Response**:
 
