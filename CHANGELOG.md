@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.3](https://github.com/first-fluke/oh-my-ag/compare/oh-my-ag-v1.5.2...oh-my-ag-v1.5.3) (2026-02-02)
+
+
+### Bug Fixes
+
+* correct broken file reference in SKILL.md files ([bddf54a](https://github.com/first-fluke/oh-my-ag/commit/bddf54a1f9161dec9c54d25e92e3ea3fef73d54f))
+
 ## [1.5.2](https://github.com/first-fluke/oh-my-ag/compare/oh-my-ag-v1.5.1...oh-my-ag-v1.5.2) (2026-02-01)
 
 
