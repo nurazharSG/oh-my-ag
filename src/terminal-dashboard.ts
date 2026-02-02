@@ -347,7 +347,7 @@ function renderDashboard(memoriesDir: string) {
   console.log(`${purple(`╚${border}╝`)}`);
 }
 
-export function startTerminalDashboard() {
+export async function startTerminalDashboard(): Promise<void> {
   const memoriesDir = resolveMemoriesDir();
 
   if (!existsSync(memoriesDir)) {
@@ -370,11 +370,14 @@ export function startTerminalDashboard() {
 
   watcher.on("all", () => renderDashboard(memoriesDir));
 
-  process.on("SIGINT", () => {
-    console.log("\n");
-    watcher.close();
-    process.exit(0);
-  });
+  return new Promise((resolve) => {
+    process.on("SIGINT", () => {
+      console.log("\n");
+      watcher.close();
+      resolve();
+      process.exit(0);
+    });
 
-  process.on("SIGTERM", () => process.emit("SIGINT"));
+    process.on("SIGTERM", () => process.emit("SIGINT"));
+  });
 }

@@ -26,8 +26,8 @@ program
 program
   .command("dashboard")
   .description("Start terminal dashboard (real-time agent monitoring)")
-  .action(() => {
-    startTerminalDashboard();
+  .action(async () => {
+    await startTerminalDashboard();
   });
 
 program
