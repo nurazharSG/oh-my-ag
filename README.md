@@ -1,4 +1,4 @@
-# 🛸 Antigravity Multi-Agent Skills
+# oh-my-ag: Multi-Agent Orchestrator for Antigravity
 
 [한국어](./README.ko.md)
 

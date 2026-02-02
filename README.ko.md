@@ -1,4 +1,4 @@
-# Antigravity 멀티 에이전트 스킬
+# oh-my-ag: Antigravity를 위한 멀티 에이전트 오케스트레이터
 
 Google Antigravity IDE용 전문 에이전트 스킬 모음. PM, Frontend, Backend, Mobile, QA, Debug 전문 에이전트가 Agent Manager, CLI 기반 SubAgent Orchestrator, 실시간 Serena Memory 대시보드를 통해 협업합니다.
 
