@@ -30,7 +30,7 @@ See `resources/examples.md` for input/output examples.
 Before submitting, run `resources/self-check.md`.
 
 ## Serena Memory (CLI Mode)
-See `../_shared/serena-memory-protocol.md`.
+See `../_shared/memory-protocol.md`.
 
 ## References
 - Execution steps: `resources/execution-protocol.md`

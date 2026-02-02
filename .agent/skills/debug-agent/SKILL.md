@@ -35,7 +35,7 @@ Before submitting, run `resources/checklist.md`.
 - `search_for_pattern("error pattern")`: Find similar issues
 
 ## Serena Memory (CLI Mode)
-See `../_shared/serena-memory-protocol.md`.
+See `../_shared/memory-protocol.md`.
 
 ## References
 - Execution steps: `resources/execution-protocol.md`
