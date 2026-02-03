@@ -1,6 +1,8 @@
 # oh-my-ag: Antigravity를 위한 멀티 에이전트 오케스트레이터
 
-Google Antigravity IDE용 전문 에이전트 스킬 모음. PM, Frontend, Backend, Mobile, QA, Debug 전문 에이전트가 Agent Manager, CLI 기반 SubAgent Orchestrator, 실시간 Serena Memory 대시보드를 통해 협업합니다.
+Google Antigravity를 위한 궁극의 멀티 에이전트 프레임워크.
+
+**Serena Memory**를 통해 6개의 전문 도메인 에이전트(PM, Frontend, Backend, Mobile, QA, Debug)를 조율하세요. 병렬 CLI 실행, 실시간 관측 대시보드, 제로 설정(zero-config) 방식의 점진적 스킬 로딩을 지원합니다. 에이전트 기반 코딩을 위해 모든 것이 준비된 올인원 솔루션입니다.
 
 > **마음에 드셨나요?** 스타 눌러주세요!
 >
