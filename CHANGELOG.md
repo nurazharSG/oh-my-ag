@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.6.1](https://github.com/first-fluke/oh-my-ag/compare/oh-my-ag-v1.6.0...oh-my-ag-v1.6.1) (2026-02-03)
+
+
+### Miscellaneous
+
+* update `README.ko.md` ([0169671](https://github.com/first-fluke/oh-my-ag/commit/0169671faaae4296e63005438af5095aa63813c0))
+* update prompt-manifest.json for 1.6.0 ([183436f](https://github.com/first-fluke/oh-my-ag/commit/183436fc1b8c2505d74d5335987f6e8cc0cc2553))
+
 ## [1.6.0](https://github.com/first-fluke/oh-my-ag/compare/oh-my-ag-v1.5.8...oh-my-ag-v1.6.0) (2026-02-03)
 
 
